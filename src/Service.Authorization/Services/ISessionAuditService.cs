@@ -1,22 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Service.Authorization.DataBase;
 using Service.Authorization.Domain.Models;
 
 namespace Service.Authorization.Services
 {
-    public interface ISessionAudit
+    public interface ISessionAuditService
     {
         Task NewSessionAudit(JetWalletToken baseToken, JetWalletToken newToken, string userAgent, string ip);
         Task RefreshSessionAudit(JetWalletToken prevToken, JetWalletToken newToken, string userAgent, string ip);
         Task KillSessionAudit(string sessionRootId, string sessionId, string clientId, string reason, string userAgent, string ip);
+        Task<List<Domain.Models.SessionAudit>> GetActiveSessions(string clientId);
     }
 
-    public class SessionAudit : ISessionAudit
+    public class SessionAuditServiceService : ISessionAuditService
     {
         private readonly DatabaseContextFactory _databaseContextFactory;
 
-        public SessionAudit(DatabaseContextFactory databaseContextFactory)
+        public SessionAuditServiceService(DatabaseContextFactory databaseContextFactory)
         {
             _databaseContextFactory = databaseContextFactory;
         }
@@ -25,7 +28,7 @@ namespace Service.Authorization.Services
         {
             await using var ctx = _databaseContextFactory.Create();
 
-            var entity = new SessionAuditEntity()
+            var entity = new SessionAudit()
             {
                 SessionRootId = newToken.SessionRootId,
                 SessionId = newToken.SessionRootId,
@@ -47,7 +50,7 @@ namespace Service.Authorization.Services
         {
             await using var ctx = _databaseContextFactory.Create();
 
-            var entity = new SessionAuditEntity()
+            var entity = new SessionAudit()
             {
                 SessionRootId = newToken.SessionRootId,
                 SessionId = newToken.SessionRootId,
@@ -81,6 +84,17 @@ namespace Service.Authorization.Services
             };
 
             await ctx.UpsetAsync(entity);
+        }
+
+        public async Task<List<SessionAudit>> GetActiveSessions(string clientId)
+        {
+            await using var ctx = _databaseContextFactory.Create();
+
+            var sql = "select s.* from \"authorization\".sessions s left join \"authorization\".kills k on s.\"SessionRootId\" = k.\"SessionRootId\" where k.\"SessionRootId\" is null and s.\"Expires\" < CURRENT_TIMESTAMP and s.\"ClientId\" = '{0}'";
+
+            var data = await ctx.Sessions.FromSqlRaw(sql, clientId).ToListAsync();
+
+            return data;
         }
     }
 }

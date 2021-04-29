@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Service.Authorization.DataBase
+namespace Service.Authorization.Domain.Models
 {
-    public class SessionAuditEntity 
+    public class SessionAudit
     {
         public string SessionId { get; set; }
         public string SessionRootId { get; set; }

@@ -27,7 +27,7 @@ namespace Service.Authorization.Modules
 
             builder.RegisterType<DatabaseContextFactory>().AsSelf().SingleInstance();
 
-            builder.RegisterType<SessionAudit>().As<ISessionAudit>().SingleInstance();
+            builder.RegisterType<SessionAuditServiceService>().As<ISessionAuditService>().SingleInstance();
         }
 
 

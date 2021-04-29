@@ -1,5 +1,6 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Service.Authorization.Domain.Models;
 using Service.Authorization.Grpc.Models;
 
 namespace Service.Authorization.Grpc
@@ -15,5 +16,8 @@ namespace Service.Authorization.Grpc
 
         [OperationContract]
         Task<AuthorizationResponse> RefreshSessionAsync(RefreshSessionRequest request);
+
+        [OperationContract]
+        Task<ListResponse<SessionAudit>> GetActiveSessionsAsync(GetActiveSessionsRequest request);
     }
 }

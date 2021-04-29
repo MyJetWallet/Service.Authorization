@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Service.Authorization.Domain.Models;
 
 namespace Service.Authorization.DataBase
 {
@@ -15,7 +16,7 @@ namespace Service.Authorization.DataBase
 
         public DbSet<KillSessionAuditEntity> KillSessions { get; set; }
 
-        public DbSet<SessionAuditEntity> Sessions { get; set; }
+        public DbSet<SessionAudit> Sessions { get; set; }
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
@@ -43,16 +44,19 @@ namespace Service.Authorization.DataBase
             modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.UserAgent).HasMaxLength(1024);
             modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.Ip).HasMaxLength(64);
 
-            modelBuilder.Entity<SessionAuditEntity>().ToTable(SessionsTableName);
-            modelBuilder.Entity<SessionAuditEntity>().HasKey(e => e.SessionId);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.SessionRootId).HasMaxLength(128);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.SessionId).HasMaxLength(128);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.BrokerId).HasMaxLength(128);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.BrandId).HasMaxLength(128);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.ClientId).HasMaxLength(128);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.WalletId).HasMaxLength(128);
-            modelBuilder.Entity<SessionAuditEntity>().Property(e => e.UserAgent).HasMaxLength(1024);
-            modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.Ip).HasMaxLength(64);
+            modelBuilder.Entity<SessionAudit>().ToTable(SessionsTableName);
+            modelBuilder.Entity<SessionAudit>().HasKey(e => e.SessionId);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.SessionRootId).HasMaxLength(128);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.SessionId).HasMaxLength(128);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.BrokerId).HasMaxLength(128);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.BrandId).HasMaxLength(128);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.ClientId).HasMaxLength(128);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.WalletId).HasMaxLength(128);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.UserAgent).HasMaxLength(1024);
+            modelBuilder.Entity<SessionAudit>().Property(e => e.Ip).HasMaxLength(64);
+            modelBuilder.Entity<SessionAudit>().HasIndex(e => new {e.ClientId, e.SessionRootId, e.Expires});
+            modelBuilder.Entity<SessionAudit>().HasIndex(e => new { e.ClientId, e.SessionRootId });
+            modelBuilder.Entity<SessionAudit>().HasIndex(e => e.ClientId);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -63,7 +67,7 @@ namespace Service.Authorization.DataBase
             return result;
         }
 
-        public async Task<int> UpsetAsync(SessionAuditEntity entity)
+        public async Task<int> UpsetAsync(SessionAudit entity)
         {
             var result = await Sessions.Upsert(entity).On(e => e.SessionId).NoUpdate().RunAsync();
             return result;

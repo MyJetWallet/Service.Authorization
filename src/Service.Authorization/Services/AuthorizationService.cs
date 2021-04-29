@@ -27,21 +27,21 @@ namespace Service.Authorization.Services
         private readonly IMyNoSqlServerDataWriter<SpotSessionNoSql> _writer;
         private readonly IClientRegistrationService _clientRegistrationService;
         private readonly IClientWalletService _clientWalletService;
-        private readonly ISessionAudit _sessionAudit;
+        private readonly ISessionAuditService _sessionAuditService;
 
         public AuthorizationService(
             ILogger<AuthorizationService> logger, SettingsModel settings, 
             IMyNoSqlServerDataWriter<SpotSessionNoSql> writer, 
             IClientRegistrationService clientRegistrationService,
             IClientWalletService clientWalletService,
-            ISessionAudit sessionAudit)
+            ISessionAuditService sessionAuditService)
         {
             _logger = logger;
             _settings = settings;
             _writer = writer;
             _clientRegistrationService = clientRegistrationService;
             _clientWalletService = clientWalletService;
-            _sessionAudit = sessionAudit;
+            _sessionAuditService = sessionAuditService;
         }
 
 
@@ -129,7 +129,7 @@ namespace Service.Authorization.Services
             var entity = SpotSessionNoSql.Create(request.BrokerId, request.BrandId, baseToken.Id, dueData, publicKey, token.SessionRootId);
             await _writer.InsertOrReplaceAsync(entity);
 
-            await _sessionAudit.NewSessionAudit(baseToken, token, request.UserAgent, request.Ip);
+            await _sessionAuditService.NewSessionAudit(baseToken, token, request.UserAgent, request.Ip);
 
             _logger.LogInformation("Session Authorization is success. RootSessionId: {rootIdText}. ClientId:{clientId}", token.SessionRootId, token.ClientId());
 
@@ -157,7 +157,7 @@ namespace Service.Authorization.Services
 
             request.SessionRootId.AddToActivityAsTag("sessionRootId");
 
-            await _sessionAudit.KillSessionAudit(request.SessionRootId, request.SessionId, request.ClientId, request.Reason, request.UserAgent, request.Ip);
+            await _sessionAuditService.KillSessionAudit(request.SessionRootId, request.SessionId, request.ClientId, request.Reason, request.UserAgent, request.Ip);
             _logger.LogInformation("Session is killed. ClientId: {clientId}, RootSessionId: {rootIdText}", request.ClientId, request.SessionRootId);
         }
 
@@ -289,7 +289,7 @@ namespace Service.Authorization.Services
                 WalletId = walletId
             };
 
-            await _sessionAudit.RefreshSessionAudit(token, newToken, request.UserAgent, request.Ip);
+            await _sessionAuditService.RefreshSessionAudit(token, newToken, request.UserAgent, request.Ip);
 
             _logger.LogInformation("Refresh session is success. SessionRootId: {sessionRootId}; SessionId: {sessionId}; PrevSessionId: {prevSessionId}; ClientId: {clientId}; WalletId: {walletId}",
                 newToken.SessionRootId, newToken.SessionId, token.SessionId, newToken.ClientId(), newToken.WalletId);
@@ -299,6 +299,11 @@ namespace Service.Authorization.Services
                 Token = newToken.IssueTokenAsBase64String(AuthConst.GetSessionEncodingKey()),
                 Result = true
             };
+        }
+
+        public async Task<ListResponse<Domain.Models.SessionAudit>> GetActiveSessionsAsync(GetActiveSessionsRequest request)
+        {
+            var sessions = _sessionAuditService.GetActiveSessions(request.ClientId);
         }
     }
 }
