@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ using MyJetWallet.Sdk.Service;
 using Prometheus;
 using ProtoBuf.Grpc.Server;
 using Service.Authorization.DataBase;
+using Service.Authorization.Domain.Models;
 using Service.Authorization.Grpc;
 using Service.Authorization.Modules;
 using Service.Authorization.Services;
@@ -50,7 +52,12 @@ namespace Service.Authorization
 
             app.BindServicesTree(Assembly.GetExecutingAssembly());
 
-            app.BindIsAlive();
+            var key = AuthConst.GetSessionEncodingKeyToPrint();
+
+            app.BindIsAlive(new Dictionary<string, string>()
+            {
+                {"SessionKey", key}
+            });
 
             app.UseEndpoints(endpoints =>
             {

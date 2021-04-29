@@ -29,7 +29,9 @@ namespace Service.Authorization.Domain.Models
             if (!string.IsNullOrEmpty(_key))
                 return _key;
 
-            var key = Environment.GetEnvironmentVariable("SessionEncodingKeyEnv");
+            var key = Environment.GetEnvironmentVariable(SessionEncodingKeyEnv);
+
+            var e = Environment.GetEnvironmentVariables();
 
             if (string.IsNullOrEmpty(key))
             {
