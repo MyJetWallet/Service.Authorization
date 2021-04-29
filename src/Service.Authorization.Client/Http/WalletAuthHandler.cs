@@ -53,8 +53,6 @@ namespace Service.Authorization.Client.Http
                 var items = itm.Split();
                 var authToken = items[^1];
 
-                Console.WriteLine($"Token: {authToken}");
-
                 var (result, token) = TokensManager.ParseBase64Token<JetWalletToken>(authToken, AuthConst.GetSessionEncodingKey(), DateTime.UtcNow);
 
                 token?.ClientId().AddToActivityAsTag("clientId");
@@ -117,13 +115,11 @@ namespace Service.Authorization.Client.Http
             }
             catch (UnauthorizedAccessException ex)
             {
-                Console.WriteLine(ex);
                 ex.FailActivity();
                 return Task.FromResult(AuthenticateResult.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
                 ex.FailActivity();
                 return Task.FromResult(AuthenticateResult.Fail("unauthorized"));
             }

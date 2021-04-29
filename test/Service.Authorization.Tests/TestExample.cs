@@ -224,5 +224,15 @@ xRTXrtxsuM1w6GPMbMqljQYXSAwJZb2y9ggDw8P53qukKENBy6mKyGnFYliS2T00
                 data);
 
         }
+
+        [Test]
+        public void TTtt()
+        {
+            var session = "phh8Sc2vLgde4Ds9aeQY5eaXzjN7FImLCFvE3TDwC8wXlcvwKQ5Ns0soZ/BPxwZzNUBnbyac/ElkpFg/sxKhYyMzceEr/aYNvW1TkAgQmu1quaXumfgREix0RCEo4iqjAEgJnoaivND8WpoBp0HyOkSLM6Z5xsxSOu0ID6EikVXn8xNrJY7run4w9/ZYa88Z";
+
+            var (result, baseToken) = TokensManager.ParseBase64Token<JetWalletToken>(session, Encoding.UTF8.GetBytes("e537d941-f7d2-4939-b97b-ae4722ca56aa"), DateTime.UtcNow);
+
+            Console.WriteLine(result);
+        }
     }
 }

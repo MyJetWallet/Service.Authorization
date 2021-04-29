@@ -126,7 +126,7 @@ namespace Service.Authorization.Services
             var dueData = DateTime.UtcNow.AddHours(_settings.RootSessionLifeTimeHours);
             var publicKey = MyRsa.ReadPublicKeyFromPem(request.PublicKeyPem);
 
-            var entity = SpotSessionNoSql.Create(request.BrokerId, request.BrandId, baseToken.Id, dueData, publicKey);
+            var entity = SpotSessionNoSql.Create(request.BrokerId, request.BrandId, baseToken.Id, dueData, publicKey, token.SessionRootId);
             await _writer.InsertOrReplaceAsync(entity);
 
             await _sessionAudit.NewSessionAudit(baseToken, token, request.UserAgent, request.Ip);
@@ -176,7 +176,7 @@ namespace Service.Authorization.Services
                 };
             }
 
-            if (DateTime.UtcNow > request.RequestTimestamp.AddSeconds(_settings.RequestTimeLifeSec))
+            if ( DateTime.UtcNow < request.RequestTimestamp || DateTime.UtcNow > request.RequestTimestamp.AddSeconds(_settings.RequestTimeLifeSec) )
             {
                 activity.AddTag("message", "request expired");
                 activity.SetStatus(Status.Error);

@@ -23,21 +23,19 @@ namespace Service.Authorization.Domain.Models.NoSql
 
         public DateTime DiedDateTime { get; set; }
 
-        public static SpotSessionNoSql Create(string brokerId, string brandId, string clientId, DateTime dueDateTime, string publicKeyBase64)
+        public static SpotSessionNoSql Create(string brokerId, string brandId, string clientId, DateTime dueDateTime, string publicKeyBase64, string sessionRootId)
         {
-            var rootId = Guid.NewGuid().ToString("N");
-
             return new SpotSessionNoSql()
             {
                 PartitionKey = SpotSessionNoSql.GeneratePartitionKey(clientId),
-                RowKey = SpotSessionNoSql.GenerateRowKey(rootId),
+                RowKey = SpotSessionNoSql.GenerateRowKey(sessionRootId),
                 BrokerId = brokerId,
                 BrandId = brandId,
                 ClientId = clientId,
                 CreateDateTime = DateTime.UtcNow,
                 DiedDateTime = dueDateTime,
                 PublicKeyBase64 = publicKeyBase64,
-                RootId = rootId,
+                RootId = sessionRootId,
                 Expires = dueDateTime
             };
         }
