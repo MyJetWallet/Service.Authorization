@@ -2,6 +2,9 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MyJetWallet.Domain;
+using Service.Authorization.Domain.Models;
+using SimpleTrading.TokensManager;
+
 // ReSharper disable UnusedMember.Global
 
 namespace Service.Authorization.Client.Http
@@ -95,5 +98,13 @@ namespace Service.Authorization.Client.Http
 
             return wallet;
         }
+
+        public static (TokenParseResult, JetWalletToken) ParseToken(string token)
+        {
+            var (result, data) = TokensManager.ParseBase64Token<JetWalletToken>(token, AuthConst.GetSessionEncodingKey(), DateTime.UtcNow);
+
+            return (result, data);
+        }
+
     }
 }
