@@ -33,7 +33,7 @@ namespace Service.Authorization.Client.Http
 
         public const string SignatureClaim = "Request-Signature";
         
-        private const string AuthorizationHeader = "authorization";
+        public const string AuthorizationHeader = "authorization";
         private const string SignatureHeader = "signature";
 
         public WalletAuthHandler(IOptionsMonitor<WalletAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock,

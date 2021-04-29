@@ -63,6 +63,19 @@ namespace Service.Authorization.Client.Http
             return result;
         }
 
+        public static string GetSessionToken(this ControllerBase controller)
+        {
+            if (controller.HttpContext.Request.Headers.ContainsKey(WalletAuthHandler.AuthorizationHeader))
+            {
+                var itm = controller.HttpContext.Request.Headers[WalletAuthHandler.AuthorizationHeader].ToString().Trim();
+                var items = itm.Split();
+                var authToken = items[^1];
+                return authToken;
+            }
+
+            return string.Empty;
+        }
+
         public static (string, string) GetSessionId(this ControllerBase controller)
         {
             var claim = controller?.HttpContext?.User?.Claims.FirstOrDefault(e => e.Type == WalletAuthHandler.SessionIdClaim);

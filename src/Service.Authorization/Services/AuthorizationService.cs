@@ -129,7 +129,7 @@ namespace Service.Authorization.Services
             var entity = SpotSessionNoSql.Create(request.BrokerId, request.BrandId, baseToken.Id, dueData, publicKey);
             await _writer.InsertOrReplaceAsync(entity);
 
-            await _sessionAudit.NewSessionAudit(baseToken, token, request.UserAgent);
+            await _sessionAudit.NewSessionAudit(baseToken, token, request.UserAgent, request.Ip);
 
             _logger.LogInformation("Session Authorization is success. RootSessionId: {rootIdText}. ClientId:{clientId}", token.SessionRootId, token.ClientId());
 
@@ -144,32 +144,21 @@ namespace Service.Authorization.Services
         {
             using var activity = MyTelemetry.StartActivity("Kill Root Session");
 
-            if (string.IsNullOrEmpty(request.Token))
+            if (string.IsNullOrEmpty(request.SessionRootId) || string.IsNullOrEmpty(request.ClientId))
             {
-                _logger.LogWarning("Cannot kill session, token is empty");
+                _logger.LogWarning("Cannot kill session, RootSessionId is empty or ClientId is empty");
                 activity.SetStatus(Status.Error);
                 return;
             }
 
-            var (result, token) = TokensManager.ParseBase64Token<JetWalletToken>(request.Token, AuthConst.GetSessionEncodingKey(), DateTime.UtcNow);
+            await _writer.DeleteAsync(SpotSessionNoSql.GeneratePartitionKey(request.ClientId), SpotSessionNoSql.GenerateRowKey(request.SessionRootId));
 
-            if (result != TokenParseResult.Ok && result != TokenParseResult.Expired)
-            {
-                _logger.LogWarning("Cannot kill session, token is wrong. Token: {tokenText}", request.Token);
-                activity.SetStatus(Status.Error);
-                return;
-            }
+            request.ClientId.AddToActivityAsTag("clientId");
 
-            await _writer.DeleteAsync(SpotSessionNoSql.GeneratePartitionKey(token.ClientId()), SpotSessionNoSql.GenerateRowKey(token.SessionRootId));
+            request.SessionRootId.AddToActivityAsTag("sessionRootId");
 
-            token.Id.AddToActivityAsTag("clientId");
-            token.BrokerId.AddToActivityAsTag("brokerId");
-            token.BrandId.AddToActivityAsTag("brandId");
-
-            token.SessionRootId.AddToActivityAsTag("sessionRootId");
-
-            await _sessionAudit.KillSessionAudit(token);
-            _logger.LogInformation("Session is killed. ClientId: {clientId}, RootSessionId: {rootIdText}", token.ClientId(), token.SessionRootId);
+            await _sessionAudit.KillSessionAudit(request.SessionRootId, request.SessionId, request.ClientId, request.Reason, request.UserAgent, request.Ip);
+            _logger.LogInformation("Session is killed. ClientId: {clientId}, RootSessionId: {rootIdText}", request.ClientId, request.SessionRootId);
         }
 
         public async Task<AuthorizationResponse> RefreshSessionAsync(RefreshSessionRequest request)
@@ -300,7 +289,7 @@ namespace Service.Authorization.Services
                 WalletId = walletId
             };
 
-            await _sessionAudit.RefreshSessionAudit(token, newToken, request.UserAgent);
+            await _sessionAudit.RefreshSessionAudit(token, newToken, request.UserAgent, request.Ip);
 
             _logger.LogInformation("Refresh session is success. SessionRootId: {sessionRootId}; SessionId: {sessionId}; PrevSessionId: {prevSessionId}; ClientId: {clientId}; WalletId: {walletId}",
                 newToken.SessionRootId, newToken.SessionId, token.SessionId, newToken.ClientId(), newToken.WalletId);

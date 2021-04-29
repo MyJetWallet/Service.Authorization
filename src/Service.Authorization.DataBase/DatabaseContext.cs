@@ -39,6 +39,9 @@ namespace Service.Authorization.DataBase
             modelBuilder.Entity<KillSessionAuditEntity>().HasKey(e => e.SessionRootId);
             modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.SessionRootId).HasMaxLength(128);
             modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.SessionId).HasMaxLength(128);
+            modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.Reason).HasMaxLength(128);
+            modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.UserAgent).HasMaxLength(1024);
+            modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.Ip).HasMaxLength(64);
 
             modelBuilder.Entity<SessionAuditEntity>().ToTable(SessionsTableName);
             modelBuilder.Entity<SessionAuditEntity>().HasKey(e => e.SessionId);
@@ -49,6 +52,7 @@ namespace Service.Authorization.DataBase
             modelBuilder.Entity<SessionAuditEntity>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<SessionAuditEntity>().Property(e => e.WalletId).HasMaxLength(128);
             modelBuilder.Entity<SessionAuditEntity>().Property(e => e.UserAgent).HasMaxLength(1024);
+            modelBuilder.Entity<KillSessionAuditEntity>().Property(e => e.Ip).HasMaxLength(64);
 
             base.OnModelCreating(modelBuilder);
         }

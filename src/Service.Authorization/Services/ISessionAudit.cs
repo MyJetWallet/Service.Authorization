@@ -7,9 +7,9 @@ namespace Service.Authorization.Services
 {
     public interface ISessionAudit
     {
-        Task NewSessionAudit(JetWalletToken baseToken, JetWalletToken newToken, string userAgent);
-        Task RefreshSessionAudit(JetWalletToken prevToken, JetWalletToken newToken, string userAgent);
-        Task KillSessionAudit(JetWalletToken token);
+        Task NewSessionAudit(JetWalletToken baseToken, JetWalletToken newToken, string userAgent, string ip);
+        Task RefreshSessionAudit(JetWalletToken prevToken, JetWalletToken newToken, string userAgent, string ip);
+        Task KillSessionAudit(string sessionRootId, string sessionId, string clientId, string reason, string userAgent, string ip);
     }
 
     public class SessionAudit : ISessionAudit
@@ -21,7 +21,7 @@ namespace Service.Authorization.Services
             _databaseContextFactory = databaseContextFactory;
         }
 
-        public async Task NewSessionAudit(JetWalletToken baseToken, JetWalletToken newToken, string userAgent)
+        public async Task NewSessionAudit(JetWalletToken baseToken, JetWalletToken newToken, string userAgent, string ip)
         {
             await using var ctx = _databaseContextFactory.Create();
 
@@ -36,13 +36,14 @@ namespace Service.Authorization.Services
                 WalletId = newToken.WalletId,
                 CreateTime = DateTime.UtcNow,
                 Expires = newToken.Expires,
-                UserAgent = userAgent
+                UserAgent = userAgent,
+                Ip = ip
             };
 
             await ctx.UpsetAsync(entity);
         }
 
-        public async Task RefreshSessionAudit(JetWalletToken prevToken, JetWalletToken newToken, string userAgent)
+        public async Task RefreshSessionAudit(JetWalletToken prevToken, JetWalletToken newToken, string userAgent, string ip)
         {
             await using var ctx = _databaseContextFactory.Create();
 
@@ -57,22 +58,26 @@ namespace Service.Authorization.Services
                 WalletId = newToken.WalletId,
                 CreateTime = DateTime.UtcNow,
                 Expires = newToken.Expires,
-                UserAgent = userAgent
+                UserAgent = userAgent,
+                Ip = ip
             };
 
             await ctx.UpsetAsync(entity);
         }
 
-        public async Task KillSessionAudit(JetWalletToken token)
+        public async Task KillSessionAudit(string sessionRootId, string sessionId, string clientId, string reason, string userAgent, string ip)
         {
             await using var ctx = _databaseContextFactory.Create();
 
 
             var entity = new KillSessionAuditEntity()
             {
-                SessionId = token.SessionId,
-                SessionRootId = token.SessionRootId,
-                KillTime = DateTime.UtcNow
+                SessionId = sessionId,
+                SessionRootId = sessionRootId,
+                KillTime = DateTime.UtcNow,
+                Ip = ip,
+                Reason = reason,
+                UserAgent = userAgent
             };
 
             await ctx.UpsetAsync(entity);

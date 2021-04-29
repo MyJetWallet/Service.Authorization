@@ -28,6 +28,9 @@ namespace Service.Authorization.Grpc.Models
 
         [DataMember(Order = 6)]
         public string UserAgent { get; set; }
+
+        [DataMember(Order = 7)]
+        public string Ip { get; set; }
     }
 
 }

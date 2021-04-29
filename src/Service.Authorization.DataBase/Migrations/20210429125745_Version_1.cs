@@ -17,7 +17,10 @@ namespace Service.Authorization.DataBase.Migrations
                 {
                     SessionRootId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     SessionId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    KillTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    KillTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UserAgent = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    Reason = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Ip = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -38,7 +41,8 @@ namespace Service.Authorization.DataBase.Migrations
                     WalletId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     BaseSessionId = table.Column<string>(type: "text", nullable: true),
                     CreateTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UserAgent = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true)
+                    UserAgent = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    Ip = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

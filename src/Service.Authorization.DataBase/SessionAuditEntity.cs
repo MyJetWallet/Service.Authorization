@@ -17,5 +17,6 @@ namespace Service.Authorization.DataBase
         public string BaseSessionId { get; set; }
         public DateTime CreateTime { get; set; }
         public string UserAgent { get; set; }
+        public string Ip { get; set; }
     }
 }

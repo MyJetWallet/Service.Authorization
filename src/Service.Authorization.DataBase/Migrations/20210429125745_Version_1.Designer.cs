@@ -10,7 +10,7 @@ using Service.Authorization.DataBase;
 namespace Service.Authorization.DataBase.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210429112609_Version_1")]
+    [Migration("20210429125745_Version_1")]
     partial class Version_1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,12 +28,24 @@ namespace Service.Authorization.DataBase.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<string>("Ip")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<DateTime>("KillTime")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("SessionId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.HasKey("SessionRootId");
 
@@ -66,6 +78,9 @@ namespace Service.Authorization.DataBase.Migrations
 
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Ip")
+                        .HasColumnType("text");
 
                     b.Property<string>("SessionRootId")
                         .HasMaxLength(128)

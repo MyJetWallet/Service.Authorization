@@ -26,12 +26,24 @@ namespace Service.Authorization.DataBase.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<string>("Ip")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<DateTime>("KillTime")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("SessionId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.HasKey("SessionRootId");
 
@@ -64,6 +76,9 @@ namespace Service.Authorization.DataBase.Migrations
 
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Ip")
+                        .HasColumnType("text");
 
                     b.Property<string>("SessionRootId")
                         .HasMaxLength(128)
