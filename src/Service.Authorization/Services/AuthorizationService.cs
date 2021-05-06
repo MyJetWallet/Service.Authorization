@@ -301,9 +301,15 @@ namespace Service.Authorization.Services
             };
         }
 
-        public async Task<ListResponse<Domain.Models.SessionAudit>> GetActiveSessionsAsync(GetActiveSessionsRequest request)
+        public async Task<ListResponse<SessionAudit>> GetActiveSessionsAsync(GetActiveSessionsRequest request)
         {
-            var sessions = _sessionAuditService.GetActiveSessions(request.ClientId);
+            var sessions = await _sessionAuditService.GetActiveSessions(request.ClientId);
+
+            return new ListResponse<SessionAudit>()
+            {
+                List = sessions
+            };
+
         }
     }
 }
