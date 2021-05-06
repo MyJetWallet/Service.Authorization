@@ -74,7 +74,7 @@ namespace Service.Authorization.Services
             var token = new JetWalletToken()
             {
                 Id = baseToken.Id,
-                Expires = baseToken.Expires,
+                Expires = DateTime.UtcNow.AddMinutes(_settings.SessionLifeTimeMinutes),
                 SessionRootId = Guid.NewGuid().ToString("N"),
                 SessionId = Guid.NewGuid().ToString("N"),
                 BrandId = request.BrandId,
