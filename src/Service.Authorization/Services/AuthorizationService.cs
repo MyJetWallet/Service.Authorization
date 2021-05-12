@@ -176,7 +176,7 @@ namespace Service.Authorization.Services
                 };
             }
 
-            if ( DateTime.UtcNow < request.RequestTimestamp || DateTime.UtcNow > request.RequestTimestamp.AddSeconds(_settings.RequestTimeLifeSec) )
+            if ( DateTime.UtcNow < request.RequestTimestamp || request.RequestTimestamp < DateTime.UtcNow.AddSeconds(-_settings.RequestTimeLifeSec))
             {
                 activity.AddTag("message", "request expired");
                 activity.SetStatus(Status.Error);
