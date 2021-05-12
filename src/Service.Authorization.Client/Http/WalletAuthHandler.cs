@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using MyJetWallet.Domain;
 using MyJetWallet.Sdk.Service;
 using MyNoSqlServer.Abstractions;
+using OpenTelemetry.Trace;
 using Service.Authorization.Domain.Models;
 using Service.Authorization.Domain.Models.NoSql;
 using Service.Wallet.Api.Authentication;
@@ -42,7 +43,7 @@ namespace Service.Authorization.Client.Http
             _reader = reader;
         }
 
-        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             try
             {
@@ -73,10 +74,25 @@ namespace Service.Authorization.Client.Http
                 }
 
                 var rootSession = _reader.Get(SpotSessionNoSql.GeneratePartitionKey(token.ClientId()), SpotSessionNoSql.GenerateRowKey(token.SessionRootId));
+                
+                if (rootSession == null)
+                {
+                    var iterations = 0;
+                    while (rootSession == null && iterations < 10)
+                    {
+                        iterations++;
+                        await Task.Delay(500);
+                        rootSession = _reader.Get(SpotSessionNoSql.GeneratePartitionKey(token.ClientId()), SpotSessionNoSql.GenerateRowKey(token.SessionRootId));
+                    }
+
+                    iterations.AddToActivityAsTag("session-iterations");
+                }
+
                 if (rootSession == null)
                 {
                     throw new UnauthorizedAccessException($"Wrong token: root session is not found");
                 }
+
 
                 var clientId = new JetClientIdentity(token.BrokerId, token.BrandId, token.Id);
 
@@ -111,17 +127,17 @@ namespace Service.Authorization.Client.Http
                 }
                 var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), this.Scheme.Name);
 
-                return Task.FromResult(AuthenticateResult.Success(ticket));
+                return AuthenticateResult.Success(ticket);
             }
             catch (UnauthorizedAccessException ex)
             {
                 ex.FailActivity();
-                return Task.FromResult(AuthenticateResult.Fail(ex.Message));
+                return AuthenticateResult.Fail(ex.Message);
             }
             catch (Exception ex)
             {
                 ex.FailActivity();
-                return Task.FromResult(AuthenticateResult.Fail("unauthorized"));
+                return AuthenticateResult.Fail("unauthorized");
             }
         }
     }
