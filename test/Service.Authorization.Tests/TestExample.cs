@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Service.Authorization.Domain.Models;
 using SimpleTrading.Cryptography;
@@ -234,5 +235,20 @@ xRTXrtxsuM1w6GPMbMqljQYXSAwJZb2y9ggDw8P53qukKENBy6mKyGnFYliS2T00
 
             Console.WriteLine(result);
         }
+
+
+        [Test]
+        public void TTtt2()
+        {
+            var session = "u4uVXItnwcLG0rdTULo7LotsqiQNw1DbpvIkLCEMnG8xb9lREXY5h4GRlOiIiaFipKTZw7oS0KkZuryJrj0L4x1uG3hMDtBLY2yRQ/hsEX478wIr5gePCEltZ5H49WyLivLu2uxL1DmTAbDPQjKknPM+xlXz4kXSDZ7ZJz88LOMNUE8tMRp73R/2uINRUBZK5w+Xbw8Yz9Bii7RQLvM+RZBLLzPr9I0mi4o6UvDOXmmtLyoJeoQU5+iZgJ9tdzHJtEAaLCyWlBx1At0u6E+llA==";
+
+            var (result, baseToken) = TokensManager.ParseBase64Token<JetWalletToken>(session, Encoding.UTF8.GetBytes("e537d941-f7d2-4939-b97b-ae4722ca56aa"), DateTime.UtcNow);
+
+            Console.WriteLine(result);
+
+            Console.WriteLine(JsonConvert.SerializeObject(baseToken));
+        }
+
+
     }
 }
