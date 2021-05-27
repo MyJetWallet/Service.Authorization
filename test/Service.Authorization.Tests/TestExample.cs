@@ -249,6 +249,34 @@ xRTXrtxsuM1w6GPMbMqljQYXSAwJZb2y9ggDw8P53qukKENBy6mKyGnFYliS2T00
             Console.WriteLine(JsonConvert.SerializeObject(baseToken));
         }
 
+        [Test]
+        public void PublicKeyLength()
+        {
+            var publicKey = @"-----BEGIN PUBLIC KEY-----
+MIIBCgKCAQEAzOmgHr6eI+2uDGCYkEg+aGGxcRwRWYL7g6ynwMxunYdPMw6Kylym
+xP5bEGn9s7svfvQdklJNeqU/QdnyNflne70SHB4m7hNYimF8mNbJyUPGs4nIkHW2
+jtRmJUeWR3RYcB9upMsNWcZG2wej7oV5eDmVrF7haeMIrQKSU4/IypYgc5coZWf6
+EXAdjRPYddpjyS1GaatSBqVp66hlQB8GchcxogTxbWN/jcQp8VwAptK2hx5r/K9C
+H9DxWR0VM/m9OIbmrC5cKbksn41OtwpaMe/1KErODVbmVuYm/ol+TCO7CV2Tumoc
+F5VttjXLf59tV6ikrhMmuY8fUlnFW1ujvwIDAQAB
+-----END PUBLIC KEY-----";
+
+            var keyString = MyRsa.ReadPublicKeyFromPem(publicKey);
+
+            var key = Convert.FromBase64String(keyString);
+
+            Console.WriteLine($"{key.Length}   {keyString.Length}");
+
+
+            var rsa = RSA.Create(1024);
+
+            var privateKey1 = rsa.ExportRSAPrivateKey();
+            var publicKey1 = rsa.ExportRSAPublicKey();
+
+
+            Console.WriteLine($"{privateKey1.Length}   {publicKey1.Length}");
+        }
+
 
     }
 }
