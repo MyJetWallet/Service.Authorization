@@ -13,32 +13,21 @@ namespace Service.Authorization.Settings
 
         [YamlProperty("Authorization.ElkLogs")]
         public LogElkSettings ElkLogs { get; set; }
-
-        [YamlProperty("Authorization.MyNoSqlWriterUrl")]
-        public string MyNoSqlWriterUrl { get; set; }
-
-        [YamlProperty("Authorization.RootSessionLifeTimeHours")]
-        public int RootSessionLifeTimeHours { get; set; }
-
-        [YamlProperty("Authorization.TimeoutToRefreshNewSessionInSec")]
-        public int TimeoutToRefreshNewSessionInSec { get; set; }
-
-        [YamlProperty("Authorization.SessionLifeTimeMinutes")]
-        public int SessionLifeTimeMinutes { get; set; }
-
-        [YamlProperty("Authorization.RequestTimeLifeSec")]
-        public int RequestTimeLifeSec { get; set; }
-
+        
+        [YamlProperty("Authorization.PostgresConnectionString")]
+        public string PostgresConnectionString { get; set; }  
+        
         [YamlProperty("Authorization.MyNoSqlReaderHostPort")]
         public string MyNoSqlReaderHostPort { get; set; }
+        
+        [YamlProperty("Authorization.MyNoSqlWriterUrl")]
+        public string MyNoSqlWriterUrl { get; set; }      
+        
+        [YamlProperty("Authorization.MaxItemsInCache")]
+        public int MaxItemsInCache { get; set; }
 
-        [YamlProperty("Authorization.RegistrationGrpcServiceUrl")]
-        public string RegistrationGrpcServiceUrl { get; set; }
-
-        [YamlProperty("Authorization.ClientWalletsGrpcServiceUrl")]
-        public string ClientWalletsGrpcServiceUrl { get; set; }
-
-        [YamlProperty("Authorization.PostgresConnectionString")]
-        public string PostgresConnectionString { get; set; }
+        [YamlProperty("Authorization.SpotServiceBusHostPort")]
+        public string SpotServiceBusHostPort { get; set; }
+        
     }
 }

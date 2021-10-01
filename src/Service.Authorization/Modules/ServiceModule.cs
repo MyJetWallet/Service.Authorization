@@ -1,12 +1,12 @@
 ﻿using Autofac;
+using Autofac.Core;
+using Autofac.Core.Registration;
+using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
-using MyNoSqlServer.Abstractions;
-using MyNoSqlServer.DataReader;
-using Service.Authorization.DataBase;
-using Service.Authorization.Domain.Models.NoSql;
+using MyJetWallet.Sdk.ServiceBus;
+using Service.Authorization.Domain.Models.ServiceBus;
+using Service.Authorization.NoSql;
 using Service.Authorization.Services;
-using Service.ClientWallets.Client;
-using Service.Registration.Client;
 
 namespace Service.Authorization.Modules
 {
@@ -14,30 +14,29 @@ namespace Service.Authorization.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            var myNoSqlClient = new MyNoSqlTcpClient(
-                Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort),
-                ApplicationEnvironment.HostName ?? $"{ApplicationEnvironment.AppName}:{ApplicationEnvironment.AppVersion}");
+            var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
+            var spotServiceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), ApplicationEnvironment.HostName, Program.LogFactory);
 
-            builder.RegisterInstance(myNoSqlClient).AsSelf().SingleInstance();
-
-            RegisterMyNoSqlWriter<SpotSessionNoSql>(builder, SpotSessionNoSql.TableName);
-
-            builder.RegisterClientRegistrationClient(myNoSqlClient, Program.Settings.RegistrationGrpcServiceUrl);
-            builder.RegisterClientWalletsClients(myNoSqlClient, Program.Settings.ClientWalletsGrpcServiceUrl);
-
-            builder.RegisterType<DatabaseContextFactory>().AsSelf().SingleInstance();
-
-            builder.RegisterType<SessionAuditServiceService>().As<ISessionAuditService>().SingleInstance();
-        }
-
-
-        private void RegisterMyNoSqlWriter<TEntity>(ContainerBuilder builder, string table)
-            where TEntity : IMyNoSqlDbEntity, new()
-        {
-            builder.Register(ctx => new MyNoSqlServer.DataWriter.MyNoSqlServerDataWriter<TEntity>(
-                    Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), table, true))
-                .As<IMyNoSqlServerDataWriter<TEntity>>()
+            builder
+                .RegisterInstance(MyNoSqlAuthCacheFactory.CreateAuthCacheNoSqlWriter(
+                    Program.ReloadedSettings(e => e.MyNoSqlWriterUrl),
+                    Program.EncodingKey,
+                    Program.EncodingInitVector))
+                .AsSelf()
                 .SingleInstance();
+            
+            builder
+                .RegisterInstance(noSqlClient.CreateAuthCacheMyNoSqlReader(Program.EncodingKey,
+                    Program.EncodingInitVector))
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterMyServiceBusPublisher<ClientAuthenticationMessage>(spotServiceBusClient,
+                ClientAuthenticationMessage.TopicName, false);
+
+            builder.RegisterType<AuthenticationCredentialsRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<AuthLogRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<AuthLogQueue>().AsSelf().SingleInstance();
         }
     }
 }

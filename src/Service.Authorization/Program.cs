@@ -15,7 +15,13 @@ namespace Service.Authorization
     public class Program
     {
         public const string SettingsFileName = ".myjetwallet";
+        
+        public const string EncodingKeyStr = "ENCODING_KEY";
+        public const string EncodingInitVectorStr = "ENCODING_INIT_VECTOR";
 
+        public static byte[] EncodingKey { get; set; }
+        public static byte[] EncodingInitVector { get; set; }
+        
         public static SettingsModel Settings { get; private set; }
 
         public static ILoggerFactory LogFactory { get; private set; }

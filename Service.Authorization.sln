@@ -29,7 +29,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\release-service.yml = .github\workflows\release-service.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Authorization.DataBase", "src\Service.Authorization.DataBase\Service.Authorization.DataBase.csproj", "{EB2AC5A7-091C-4A4E-B633-47199746051C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Authorization.Domain", "src\Service.Authorization.Domain\Service.Authorization.Domain.csproj", "{5CFE74A4-CDBB-4E2D-9C0A-9CEF20DCB38B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Authorization.NoSql", "src\Service.Authorization.NoSql\Service.Authorization.NoSql.csproj", "{C67EA6FB-CA76-4D7F-A029-CF437AFA69BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Authorization.Postgres", "src\Service.Authorization.Postgres\Service.Authorization.Postgres.csproj", "{E2F745D1-0427-4F33-A063-AD7A534C8494}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,10 +65,18 @@ Global
 		{FF868A2B-24FA-42B0-8400-95EDEE689678}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF868A2B-24FA-42B0-8400-95EDEE689678}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF868A2B-24FA-42B0-8400-95EDEE689678}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB2AC5A7-091C-4A4E-B633-47199746051C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB2AC5A7-091C-4A4E-B633-47199746051C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB2AC5A7-091C-4A4E-B633-47199746051C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB2AC5A7-091C-4A4E-B633-47199746051C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFE74A4-CDBB-4E2D-9C0A-9CEF20DCB38B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFE74A4-CDBB-4E2D-9C0A-9CEF20DCB38B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFE74A4-CDBB-4E2D-9C0A-9CEF20DCB38B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFE74A4-CDBB-4E2D-9C0A-9CEF20DCB38B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C67EA6FB-CA76-4D7F-A029-CF437AFA69BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C67EA6FB-CA76-4D7F-A029-CF437AFA69BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C67EA6FB-CA76-4D7F-A029-CF437AFA69BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C67EA6FB-CA76-4D7F-A029-CF437AFA69BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2F745D1-0427-4F33-A063-AD7A534C8494}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F745D1-0427-4F33-A063-AD7A534C8494}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2F745D1-0427-4F33-A063-AD7A534C8494}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2F745D1-0427-4F33-A063-AD7A534C8494}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,7 +87,9 @@ Global
 		{5FAB1BBA-DE6F-4189-8CF0-D4D77D9C660B} = {446301A0-97F2-4921-BA0B-32B76039C73B}
 		{B64315EC-2356-4586-8A89-111D88A942B8} = {EB832FF1-4E01-40ED-BAC4-5ECF70F5C108}
 		{FF868A2B-24FA-42B0-8400-95EDEE689678} = {D11EB899-A148-4C9B-B340-B907EF71C4A2}
-		{EB2AC5A7-091C-4A4E-B633-47199746051C} = {446301A0-97F2-4921-BA0B-32B76039C73B}
+		{5CFE74A4-CDBB-4E2D-9C0A-9CEF20DCB38B} = {446301A0-97F2-4921-BA0B-32B76039C73B}
+		{C67EA6FB-CA76-4D7F-A029-CF437AFA69BE} = {446301A0-97F2-4921-BA0B-32B76039C73B}
+		{E2F745D1-0427-4F33-A063-AD7A534C8494} = {446301A0-97F2-4921-BA0B-32B76039C73B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6BF00C9D-AD55-40F2-8FE3-E5C3559B3E26}

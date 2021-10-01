@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Reflection;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,10 +13,9 @@ using MyJetWallet.Sdk.Postgres;
 using MyJetWallet.Sdk.Service;
 using Prometheus;
 using ProtoBuf.Grpc.Server;
-using Service.Authorization.DataBase;
-using Service.Authorization.Domain.Models;
 using Service.Authorization.Grpc;
 using Service.Authorization.Modules;
+using Service.Authorization.Postgres;
 using Service.Authorization.Services;
 using SimpleTrading.BaseMetrics;
 using SimpleTrading.ServiceStatusReporterConnector;
@@ -33,10 +33,15 @@ namespace Service.Authorization
             });
 
             services.AddHostedService<ApplicationLifetimeManager>();
+            
+            DatabaseContext.LoggerFactory = Program.LogFactory;
+            services.AddDatabase(DatabaseContext.Schema, Program.Settings.PostgresConnectionString,
+                o => new DatabaseContext(o));
+            DatabaseContext.LoggerFactory = null;
 
+            GetEnvVariables();
+            
             services.AddMyTelemetry("SP-", Program.Settings.ZipkinUrl);
-
-            services.AddDatabase(DatabaseContext.Schema, Program.Settings.PostgresConnectionString, o => new DatabaseContext(o));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,16 +57,11 @@ namespace Service.Authorization
 
             app.BindServicesTree(Assembly.GetExecutingAssembly());
 
-            var key = AuthConst.GetSessionEncodingKeyToPrint();
-
-            app.BindIsAlive(new Dictionary<string, string>()
-            {
-                {"SessionKey", key}
-            });
+            app.BindIsAlive();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcSchema<AuthorizationService, IAuthorizationService>();
+                endpoints.MapGrpcSchema<AuthService, IAuthService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 
@@ -76,6 +76,22 @@ namespace Service.Authorization
         {
             builder.RegisterModule<SettingsModule>();
             builder.RegisterModule<ServiceModule>();
+        }
+        
+        private void GetEnvVariables()
+        {
+            var key = Environment.GetEnvironmentVariable(Program.EncodingKeyStr);
+            
+            if (string.IsNullOrEmpty(key))
+                throw new Exception($"Env Variable {Program.EncodingKeyStr} is not found");
+            
+            var initVector = Environment.GetEnvironmentVariable(Program.EncodingInitVectorStr);
+            
+            if (string.IsNullOrEmpty(initVector))
+                throw new Exception($"Env Variable {Program.EncodingInitVectorStr} is not found");
+
+            Program.EncodingKey = Encoding.UTF8.GetBytes(key);
+            Program.EncodingInitVector = Encoding.UTF8.GetBytes(initVector);
         }
     }
 }

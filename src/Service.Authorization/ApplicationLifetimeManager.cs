@@ -1,32 +1,36 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
-using MyNoSqlServer.DataReader;
+using MyServiceBus.TcpClient;
 
 namespace Service.Authorization
 {
     public class ApplicationLifetimeManager : ApplicationLifetimeManagerBase
     {
         private readonly ILogger<ApplicationLifetimeManager> _logger;
-        private readonly MyNoSqlTcpClient _myNoSqlTcpClient;
-
-        public ApplicationLifetimeManager(IHostApplicationLifetime appLifetime, ILogger<ApplicationLifetimeManager> logger, MyNoSqlTcpClient myNoSqlTcpClient)
+        private readonly MyNoSqlClientLifeTime _myNoSqlClientLifeTime;
+        private readonly MyServiceBusTcpClient _myServiceBusTcpClient;
+        public ApplicationLifetimeManager(IHostApplicationLifetime appLifetime, ILogger<ApplicationLifetimeManager> logger, MyNoSqlClientLifeTime myNoSqlClientLifeTime, MyServiceBusTcpClient myServiceBusTcpClient)
             : base(appLifetime)
         {
             _logger = logger;
-            _myNoSqlTcpClient = myNoSqlTcpClient;
+            _myNoSqlClientLifeTime = myNoSqlClientLifeTime;
+            _myServiceBusTcpClient = myServiceBusTcpClient;
         }
 
         protected override void OnStarted()
         {
             _logger.LogInformation("OnStarted has been called.");
-            _myNoSqlTcpClient.Start();
+            _myServiceBusTcpClient.Start();
+            _myNoSqlClientLifeTime.Start();
         }
 
         protected override void OnStopping()
         {
             _logger.LogInformation("OnStopping has been called.");
-            _myNoSqlTcpClient.Stop();
+            _myServiceBusTcpClient.Stop();
+            _myNoSqlClientLifeTime.Stop();
         }
 
         protected override void OnStopped()
