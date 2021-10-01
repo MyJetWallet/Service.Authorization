@@ -1,4 +1,8 @@
 ﻿using Autofac;
+using MyJetWallet.Sdk.ServiceBus;
+using MyServiceBus.Abstractions;
+using MyServiceBus.TcpClient;
+using Service.Authorization.Domain.Models.ServiceBus;
 using Service.Authorization.Grpc;
 
 // ReSharper disable UnusedMember.Global
@@ -12,5 +16,11 @@ namespace Service.Authorization.Client
             var factory = new AuthorizationClientFactory(grpcServiceUrl);
             builder.RegisterInstance(factory.GetAuthService()).As<IAuthService>().SingleInstance();
         }
+        
+        public static void RegisterClientAuthenticationSubscriber(this ContainerBuilder builder, MyServiceBusTcpClient serviceBusClient, string queue)
+        {
+            builder.RegisterMyServiceBusSubscriberBatch<ClientAuthenticationMessage>(serviceBusClient, ClientAuthenticationMessage.TopicName, queue,
+                TopicQueueType.Permanent);
+        }    
     }
 }
