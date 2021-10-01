@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Serilog;
-using Service.Authorization.Postgres;
 using Service.Authorization.Postgres.Models;
 
-namespace Service.Authorization.Services
+namespace Service.Authorization.Postgres
 {
     public class AuthenticationCredentialsRepository
     {
@@ -19,11 +17,11 @@ namespace Service.Authorization.Services
         private readonly byte[] _initKey;
         private readonly byte[] _initVector;
         
-        public AuthenticationCredentialsRepository(ILogger<AuthenticationCredentialsRepository> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
+        public AuthenticationCredentialsRepository(ILogger<AuthenticationCredentialsRepository> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, byte[] initKey, byte[] initVector)
         {
             _logger = logger;
-            _initKey = Program.EncodingKey;
-            _initVector = Program.EncodingInitVector;
+            _initKey = initKey;
+            _initVector = initVector;
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
         }
         

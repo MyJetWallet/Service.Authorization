@@ -7,6 +7,7 @@ using Service.Authorization.Domain.Models.ServiceBus;
 using Service.Authorization.Grpc;
 using Service.Authorization.Grpc.Contracts;
 using Service.Authorization.NoSql;
+using Service.Authorization.Postgres;
 using Service.Authorization.Postgres.Models;
 using Service.Authorization.Utils;
 
