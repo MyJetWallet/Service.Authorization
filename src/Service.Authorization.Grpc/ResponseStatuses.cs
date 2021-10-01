@@ -1,9 +1,11 @@
-namespace SimpleTrading.Auth.Grpc
+namespace Service.Authorization.Grpc
 {
     public enum ResponseStatuses
     {
         Successful,
         SystemError,
-        ClientAlreadyExists
+        ClientAlreadyExists,        
+        CountryRestricted
+
     }
 }

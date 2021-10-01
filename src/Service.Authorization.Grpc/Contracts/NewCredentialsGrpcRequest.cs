@@ -1,6 +1,5 @@
 using System.Runtime.Serialization;
 using Destructurama.Attributed;
-using SimpleTrading.Auth.Grpc;
 
 namespace Service.Authorization.Grpc.Contracts
 {

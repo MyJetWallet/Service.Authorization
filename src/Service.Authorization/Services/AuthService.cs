@@ -37,7 +37,7 @@ namespace Service.Authorization.Services
             var cacheResult = _authenticationCredentialsCacheReader.GetByEmail(request.Email, request.Brand);
             string traderId = null;
 
-            if (cacheResult != null && cacheResult.Authenticate(request.Password))
+            if (cacheResult != null && cacheResult.Authenticate(request.Hash, request.Salt))
             {
                 traderId = cacheResult.Id;
             }
@@ -46,7 +46,7 @@ namespace Service.Authorization.Services
                 var responseFromDb = await _authenticationCredentialsRepository
                     .GetByEmailAsync(request.Email, request.Brand);
 
-                if (responseFromDb != null && responseFromDb.Authenticate(request.Password))
+                if (responseFromDb != null && responseFromDb.Authenticate(request.Hash, request.Salt))
                 {
                     await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
                     await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(responseFromDb);
@@ -180,12 +180,12 @@ namespace Service.Authorization.Services
         {
             _logger.LogInformation("ComparePasswordAsync {@Request}", request);  
             var cacheResult = _authenticationCredentialsCacheReader.GetById(request.TraderId, request.Brand);
-            if (cacheResult != null && cacheResult.Authenticate(request.Password))
+            if (cacheResult != null && cacheResult.Authenticate(request.Hash, request.Salt))
                 return new ComparePasswordResponse { Ok = true };
 
             var responseFromDb = await _authenticationCredentialsRepository.GetByIdAsync(request.TraderId);
 
-            if (responseFromDb == null || !responseFromDb.Authenticate(request.Password))
+            if (responseFromDb == null || !responseFromDb.Authenticate(request.Hash, request.Salt))
                 return new ComparePasswordResponse { Ok = false };
 
             await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
@@ -209,6 +209,15 @@ namespace Service.Authorization.Services
             await _authenticationCredentialsCacheWriter.DeleteAsync(request.Email, request.Brand);
 
             _logger.LogInformation("ClearCacheAsync: Deleted from cache {@Request}", request);
+        }
+
+        public async ValueTask RegisterCredentialsAsync(AuthCredentialsGrpcModel request)
+        {
+            _logger.LogInformation("RegisterCredentialsAsync {@Request}", request);
+            await _authenticationCredentialsRepository.AddCredentialsAsync(request.Email, request.Hash, request.Salt,
+                request.Brand);
+            
+            _logger.LogInformation("RegisterCredentialsAsync: Credential added {@Request}", request);
         }
 
         private async ValueTask SendAuthTriggerEvent(AuthenticateGrpcRequest request, string traderId)

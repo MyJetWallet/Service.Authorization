@@ -9,19 +9,22 @@ namespace Service.Authorization.Grpc.Contracts
         [DataMember(Order = 1)]
         public string TraderId { get; set; }
 
-        [LogMasked]
         [DataMember(Order = 2)]
-        public string Password { get; set; }
+        public string Hash { get; set; }
         
         [DataMember(Order = 3)]
+        public string Salt { get; set; }
+
+        [DataMember(Order = 4)]
         public string Brand { get; set; }
 
-        public static ComparePasswordRequest Create(string traderId, string password, string brand)
+        public static ComparePasswordRequest Create(string traderId, string hash, string salt, string brand)
         {
             return new ComparePasswordRequest
             {
                 TraderId = traderId,
-                Password = password,
+                Hash = hash,
+                Salt = salt,
                 Brand = brand
             };
         }

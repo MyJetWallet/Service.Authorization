@@ -94,5 +94,20 @@ namespace Service.Authorization.Postgres
                 throw;
             }
         }
+        
+        public async Task AddCredentialsAsync(string email, string hash, string salt, string brand)
+        {
+            await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
+            var encodeEmail = AuthenticationCredentialsEntity.EncodeEmail(email, _initKey, _initVector);
+            var entity = new AuthenticationCredentialsEntity()
+            {
+                Email = encodeEmail,
+                Hash = hash,
+                Salt = salt,
+                Brand = brand
+            };
+            await ctx.CredentialsEntities.AddAsync(entity);
+            await ctx.SaveChangesAsync();
+        }
     }
 }

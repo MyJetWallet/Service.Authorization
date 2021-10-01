@@ -30,10 +30,9 @@ namespace Service.Authorization.Postgres.Models
             Hash = AuthHelper.GeneratePasswordHash(password, Salt);
         }
         
-        public bool Authenticate(string password)
+        public bool Authenticate(string hash, string salt)
         {
-            var hash = AuthHelper.GeneratePasswordHash(password, Salt);
-            return Hash == hash;
+            return Hash == hash && Salt == salt;
         }
         
         public static string EncodeEmail(string email, byte[] key, byte[] initVector)
