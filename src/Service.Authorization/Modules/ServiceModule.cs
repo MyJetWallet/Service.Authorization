@@ -39,13 +39,7 @@ namespace Service.Authorization.Modules
             builder.RegisterMyServiceBusPublisher<ClientAuthenticationMessage>(spotServiceBusClient,
                 ClientAuthenticationMessage.TopicName, false);
             
-            
-            var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
-            var options = optionsBuilder
-                .UseNpgsql(Program.Settings.PostgresConnectionString, (contextOptionsBuilder => contextOptionsBuilder.MigrationsHistoryTable("__EFMigrationsHistory_" + DatabaseContext.Schema, DatabaseContext.Schema)))
-                .Options;
-            
-            builder.RegisterInstance(new AuthenticationCredentialsRepository(Program.LogFactory.CreateLogger<AuthenticationCredentialsRepository>(),optionsBuilder, Program.EncodingKey, Program.EncodingInitVector)).AsSelf().SingleInstance();
+            builder.RegisterType<AuthenticationCredentialsRepository>().AsSelf().SingleInstance();
             builder.RegisterType<AuthLogRepository>().AsSelf().SingleInstance();
             builder.RegisterType<AuthLogQueue>().AsSelf().SingleInstance();
         }

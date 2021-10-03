@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Service.Authorization.Postgres;
 using Service.Authorization.Postgres.Models;
 
-namespace Service.Authorization.Postgres
+namespace Service.Authorization.Services
 {
     public class AuthenticationCredentialsRepository
     {
@@ -17,11 +18,11 @@ namespace Service.Authorization.Postgres
         private readonly byte[] _initKey;
         private readonly byte[] _initVector;
         
-        public AuthenticationCredentialsRepository(ILogger<AuthenticationCredentialsRepository> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder, byte[] initKey, byte[] initVector)
+        public AuthenticationCredentialsRepository(ILogger<AuthenticationCredentialsRepository> logger, DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
         {
             _logger = logger;
-            _initKey = initKey;
-            _initVector = initVector;
+            _initKey = Program.EncodingKey;
+            _initVector = Program.EncodingInitVector;
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
         }
         
@@ -95,19 +96,15 @@ namespace Service.Authorization.Postgres
             }
         }
         
-        public async Task AddCredentialsAsync(string email, string hash, string salt, string brand)
+        public async Task<string> AddCredentialsAsync(string email, string hash, string salt, string brand)
         {
             await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
-            var encodeEmail = AuthenticationCredentialsEntity.EncodeEmail(email, _initKey, _initVector);
-            var entity = new AuthenticationCredentialsEntity()
-            {
-                Email = encodeEmail,
-                Hash = hash,
-                Salt = salt,
-                Brand = brand
-            };
+            var entity = AuthenticationCredentialsEntity.Create(email, hash, salt, _initKey,
+                _initVector, brand);
             await ctx.CredentialsEntities.AddAsync(entity);
             await ctx.SaveChangesAsync();
+
+            return entity.Id;
         }
     }
 }

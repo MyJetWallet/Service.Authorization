@@ -32,6 +32,6 @@ namespace Service.Authorization.Grpc
         ValueTask ClearCacheAsync(ClearCacheRequest request);
 
         [OperationContract]
-        ValueTask RegisterCredentialsAsync(AuthCredentialsGrpcModel request);
+        Task<RegisterNewCredentialsResponse> RegisterCredentialsAsync(AuthCredentialsGrpcModel request);
     }
 }

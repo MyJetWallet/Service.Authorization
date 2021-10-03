@@ -25,21 +25,5 @@ namespace Service.Authorization.Client
             builder.RegisterMyServiceBusSubscriberBatch<ClientAuthenticationMessage>(serviceBusClient, ClientAuthenticationMessage.TopicName, queue,
                 TopicQueueType.Permanent);
         }
-
-        public static void RegisterAuthCredentialRepository(this ContainerBuilder builder, ILoggerFactory loggerFactory, string postgresConnectionString, byte[] encodingKey, byte[] initVector)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
-            var options = optionsBuilder
-                .UseNpgsql(postgresConnectionString, (contextOptionsBuilder => contextOptionsBuilder.MigrationsHistoryTable("__EFMigrationsHistory_" + DatabaseContext.Schema, DatabaseContext.Schema)))
-                .Options;
-            
-            var repository = new AuthenticationCredentialsRepository(
-                loggerFactory.CreateLogger<AuthenticationCredentialsRepository>(),
-                optionsBuilder,
-                encodingKey,
-                initVector
-            );
-            builder.RegisterInstance(repository).AsSelf().SingleInstance();
-        }
     }
 }
