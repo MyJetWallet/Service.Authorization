@@ -51,5 +51,18 @@ namespace Service.Authorization.Postgres.Models
             
             return result;
         }
+        
+        public static AuthenticationCredentialsEntity Create(string id, string encodedEmail, string hash, string salt, string brand)
+        {
+            var result = new AuthenticationCredentialsEntity
+            {
+                Id = id,
+                Email = encodedEmail,
+                Brand = brand,
+                Salt = salt,
+                Hash = hash
+            };
+            return result;
+        }
     }
 }

@@ -211,10 +211,10 @@ namespace Service.Authorization.Services
             _logger.LogInformation("ClearCacheAsync: Deleted from cache {@Request}", request);
         }
 
-        public async ValueTask RegisterCredentialsAsync(AuthenticationCredentialsEntity entity)
+        public async ValueTask RegisterCredentialsAsync(AuthCredentialsGrpcModel entity)
         {
             _logger.LogInformation("RegisterCredentialsAsync {@Request}", entity);
-            await _authenticationCredentialsRepository.AddCredentialsAsync(entity);
+            await _authenticationCredentialsRepository.AddCredentialsAsync(AuthenticationCredentialsEntity.Create(entity.Id, entity.EncodedEmail, entity.Hash, entity.Salt, entity.Brand));
             _logger.LogInformation("RegisterCredentialsAsync: Credential added {@Request}", entity);
         }
 

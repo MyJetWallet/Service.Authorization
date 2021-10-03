@@ -33,7 +33,7 @@ namespace Service.Authorization.Grpc
         ValueTask ClearCacheAsync(ClearCacheRequest request);
 
         [OperationContract]
-        ValueTask RegisterCredentialsAsync(AuthenticationCredentialsEntity entity);
+        ValueTask RegisterCredentialsAsync(AuthCredentialsGrpcModel entity);
 
     }
 }

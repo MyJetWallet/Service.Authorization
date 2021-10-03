@@ -6,7 +6,7 @@ namespace Service.Authorization.Grpc.Contracts
     public class AuthCredentialsGrpcModel
     {
         [DataMember(Order = 1)]
-        public string Email { get; set; }
+        public string EncodedEmail { get; set; }
         
         [DataMember(Order = 2)]
         public string Hash { get; set; }
@@ -16,5 +16,8 @@ namespace Service.Authorization.Grpc.Contracts
 
         [DataMember(Order = 4)]
         public string Brand { get; set; }
+        
+        [DataMember(Order = 5)]
+        public string Id { get; set; }
     }
 }
