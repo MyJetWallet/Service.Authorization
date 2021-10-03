@@ -12,17 +12,21 @@ namespace Service.Authorization.Grpc.Contracts
         
         [LogMasked]
         [DataMember(Order = 2)]
-        public string Password { get; set; }
+        public string Hash { get; set; }
+
+        [DataMember(Order = 3)] 
+        public string Salt { get; set; }
         
-        [DataMember(Order = 3)]
+        [DataMember(Order = 4)]
         public string Brand { get; set; }
 
-        public static ChangePasswordGrpcContract Create(string email, string password, string brand)
+        public static ChangePasswordGrpcContract Create(string email, string hash, string salt, string brand)
         {
             return new ChangePasswordGrpcContract
             {
                 Email = email,
-                Password = password,
+                Hash = hash,
+                Salt = salt,
                 Brand = brand
             };
         }

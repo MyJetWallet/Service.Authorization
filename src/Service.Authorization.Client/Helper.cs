@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Service.Authorization.Postgres
+namespace Service.Authorization.Client
 {
     public static class AuthHelper
     {

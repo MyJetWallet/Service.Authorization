@@ -165,7 +165,7 @@ namespace Service.Authorization.Services
         public async ValueTask<ChangePasswordGrpcResponse> ChangePasswordAsync(ChangePasswordGrpcContract request)
         {
             _logger.LogInformation("ChangePasswordAsync {@Request}", request);
-            var newEntity = await _authenticationCredentialsRepository.ChangePasswordAsync(request.Email, request.Password, request.Brand);
+            var newEntity = await _authenticationCredentialsRepository.ChangePasswordAsync(request.Email, request.Hash, request.Salt, request.Brand);
             if (newEntity == null)
                 return new ChangePasswordGrpcResponse();
 

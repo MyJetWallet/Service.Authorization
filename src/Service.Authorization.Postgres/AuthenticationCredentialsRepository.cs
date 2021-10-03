@@ -71,7 +71,7 @@ namespace Service.Authorization.Postgres
             }
         }
 
-        public async Task<AuthenticationCredentialsEntity> ChangePasswordAsync(string email, string password, string brand)
+        public async Task<AuthenticationCredentialsEntity> ChangePasswordAsync(string email, string hash, string salt, string brand)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Service.Authorization.Postgres
                 if (entity == null)
                     return null;
             
-                entity.SetPassword(password);
+                entity.SetPassword(hash, salt);
 
                 ctx.CredentialsEntities.Update(entity);
                 await ctx.SaveChangesAsync();
