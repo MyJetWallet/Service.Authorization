@@ -211,18 +211,11 @@ namespace Service.Authorization.Services
             _logger.LogInformation("ClearCacheAsync: Deleted from cache {@Request}", request);
         }
 
-        public async Task<RegisterNewCredentialsResponse> RegisterCredentialsAsync(AuthCredentialsGrpcModel request)
+        public async ValueTask RegisterCredentialsAsync(AuthenticationCredentialsEntity entity)
         {
-            _logger.LogInformation("RegisterCredentialsAsync {@Request}", request);
-            var traderId = await _authenticationCredentialsRepository.AddCredentialsAsync(request.Email, request.Hash, request.Salt,
-                request.Brand);
-            
-            _logger.LogInformation("RegisterCredentialsAsync: Credential added {@Request}", request);
-
-            return new RegisterNewCredentialsResponse()
-            {
-                TraderId = traderId
-            };
+            _logger.LogInformation("RegisterCredentialsAsync {@Request}", entity);
+            await _authenticationCredentialsRepository.AddCredentialsAsync(entity);
+            _logger.LogInformation("RegisterCredentialsAsync: Credential added {@Request}", entity);
         }
 
         private async ValueTask SendAuthTriggerEvent(AuthenticateGrpcRequest request, string traderId)

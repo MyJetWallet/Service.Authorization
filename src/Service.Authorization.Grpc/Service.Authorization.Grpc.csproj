@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Service.Authorization.Domain.Models\Service.Authorization.Domain.Models.csproj" />
+    <ProjectReference Include="..\Service.Authorization.Postgres\Service.Authorization.Postgres.csproj" />
   </ItemGroup>
 
 </Project>

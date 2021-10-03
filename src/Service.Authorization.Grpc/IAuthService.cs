@@ -1,6 +1,7 @@
 ﻿using System.ServiceModel;
 using System.Threading.Tasks;
 using Service.Authorization.Grpc.Contracts;
+using Service.Authorization.Postgres.Models;
 
 namespace Service.Authorization.Grpc
 {
@@ -32,6 +33,7 @@ namespace Service.Authorization.Grpc
         ValueTask ClearCacheAsync(ClearCacheRequest request);
 
         [OperationContract]
-        Task<RegisterNewCredentialsResponse> RegisterCredentialsAsync(AuthCredentialsGrpcModel request);
+        ValueTask RegisterCredentialsAsync(AuthenticationCredentialsEntity entity);
+
     }
 }

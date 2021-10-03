@@ -96,15 +96,11 @@ namespace Service.Authorization.Services
             }
         }
         
-        public async Task<string> AddCredentialsAsync(string email, string hash, string salt, string brand)
+        public async Task AddCredentialsAsync(AuthenticationCredentialsEntity entity)
         {
             await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
-            var entity = AuthenticationCredentialsEntity.Create(email, hash, salt, _initKey,
-                _initVector, brand);
             await ctx.CredentialsEntities.AddAsync(entity);
             await ctx.SaveChangesAsync();
-
-            return entity.Id;
         }
     }
 }
