@@ -1,6 +1,7 @@
 using System;
 using Destructurama.Attributed;
 using Newtonsoft.Json;
+using Service.Authorization.NoSql;
 
 namespace Service.Authorization.Postgres.Models
 {
@@ -31,6 +32,12 @@ namespace Service.Authorization.Postgres.Models
         public bool Authenticate(string hash, string salt)
         {
             return Hash == hash && Salt == salt;
+        }
+        
+        public bool Authenticate(string password)
+        {
+            var hash = AuthHelper.GeneratePasswordHash(password, Salt);
+            return Hash == hash;
         }
         
         public static string EncodeEmail(string email, byte[] key, byte[] initVector)

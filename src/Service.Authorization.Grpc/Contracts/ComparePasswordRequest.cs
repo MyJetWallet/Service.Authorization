@@ -10,21 +10,17 @@ namespace Service.Authorization.Grpc.Contracts
         public string TraderId { get; set; }
 
         [DataMember(Order = 2)]
-        public string Hash { get; set; }
-        
-        [DataMember(Order = 3)]
-        public string Salt { get; set; }
+        public string Password { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 3)]
         public string Brand { get; set; }
 
-        public static ComparePasswordRequest Create(string traderId, string hash, string salt, string brand)
+        public static ComparePasswordRequest Create(string traderId, string password, string brand)
         {
             return new ComparePasswordRequest
             {
                 TraderId = traderId,
-                Hash = hash,
-                Salt = salt,
+                Password = password,
                 Brand = brand
             };
         }

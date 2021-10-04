@@ -180,12 +180,12 @@ namespace Service.Authorization.Services
         {
             _logger.LogInformation("ComparePasswordAsync {@Request}", request);  
             var cacheResult = _authenticationCredentialsCacheReader.GetById(request.TraderId, request.Brand);
-            if (cacheResult != null && cacheResult.Authenticate(request.Hash, request.Salt))
+            if (cacheResult != null && cacheResult.Authenticate(request.Password))
                 return new ComparePasswordResponse { Ok = true };
 
             var responseFromDb = await _authenticationCredentialsRepository.GetByIdAsync(request.TraderId);
 
-            if (responseFromDb == null || !responseFromDb.Authenticate(request.Hash, request.Salt))
+            if (responseFromDb == null || !responseFromDb.Authenticate(request.Password))
                 return new ComparePasswordResponse { Ok = false };
 
             await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);

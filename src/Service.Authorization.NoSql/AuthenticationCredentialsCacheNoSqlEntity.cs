@@ -44,6 +44,12 @@ namespace Service.Authorization.NoSql
             return Hash == hash && Salt == salt;
         }
 
+        public bool Authenticate(string password)
+        {
+            var hash = AuthHelper.GeneratePasswordHash(password, Salt);
+            return Hash == hash;
+        }
+
         public static AuthenticationCredentialsCacheNoSqlEntity CreateByDatabaseAsset(
             AuthenticationCredentialsEntity databaseAsset)
         {

@@ -1,6 +1,4 @@
 ﻿using Autofac;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.ServiceBus;
 using MyNoSqlServer.DataReader;
 using MyServiceBus.Abstractions;
@@ -8,7 +6,6 @@ using MyServiceBus.TcpClient;
 using Service.Authorization.Domain.Models.ServiceBus;
 using Service.Authorization.Grpc;
 using Service.Authorization.NoSql;
-using Service.Authorization.Postgres;
 
 // ReSharper disable UnusedMember.Global
 
