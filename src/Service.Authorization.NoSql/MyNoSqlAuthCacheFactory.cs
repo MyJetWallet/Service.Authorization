@@ -1,7 +1,6 @@
 using System;
 using MyNoSqlServer.DataReader;
 using MyNoSqlServer.DataWriter;
-using Service.Authorization.Utils;
 
 namespace Service.Authorization.NoSql
 {

@@ -1,9 +1,8 @@
 using System;
 using MyNoSqlServer.Abstractions;
-using Service.Authorization.NoSql;
 using Service.Authorization.Postgres;
 
-namespace Service.Authorization.Utils
+namespace Service.Authorization.NoSql
 {
     public class AuthenticationCredentialsCacheReader
     {

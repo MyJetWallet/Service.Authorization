@@ -1,10 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using MyNoSqlServer.Abstractions;
-using Service.Authorization.NoSql;
 using Service.Authorization.Postgres.Models;
 
-namespace Service.Authorization.Utils
+namespace Service.Authorization.NoSql
 {
     public class AuthenticationCredentialsCacheWriter
     {
