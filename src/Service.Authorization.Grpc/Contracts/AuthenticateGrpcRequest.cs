@@ -9,28 +9,26 @@ namespace Service.Authorization.Grpc.Contracts
         [LogMasked(ShowFirst = 3, ShowLast = 3, PreserveLength = true)]
         [DataMember(Order = 1)] public string Email { get; set; }
         
-        [DataMember(Order = 2)] public string Hash { get; set; }
-        
-        [DataMember(Order = 3)] public string Salt { get; set; }
+        [LogMasked]
+        [DataMember(Order = 2)] public string Password { get; set; }
 
-        [DataMember(Order = 4)] public string Brand { get; set; }
+        [DataMember(Order = 3)] public string Brand { get; set; }
 
-        [DataMember(Order = 5)] public string Ip { get; set; }
+        [DataMember(Order = 4)] public string Ip { get; set; }
 
-        [DataMember(Order = 6)] public string UserAgent { get; set; }
+        [DataMember(Order = 5)] public string UserAgent { get; set; }
 
-        [DataMember(Order = 7)] public string LanguageId { get; set; }
+        [DataMember(Order = 6)] public string LanguageId { get; set; }
 
-        [DataMember(Order = 8)] public string Location { get; set; }
+        [DataMember(Order = 7)] public string Location { get; set; }
 
-        public static AuthenticateGrpcRequest Create(string email, string hash, string salt, string brand, string ip,
+        public static AuthenticateGrpcRequest Create(string email, string password, string brand, string ip,
             string userAgent, string languageId, string location)
         {
             return new AuthenticateGrpcRequest
             {
                 Email = email,
-                Hash = hash,
-                Salt = salt,
+                Password = password,
                 Brand = brand,
                 Ip = ip,
                 UserAgent = userAgent,

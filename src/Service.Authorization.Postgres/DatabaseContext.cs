@@ -54,11 +54,11 @@ public class DatabaseContext : DbContext
         private void SetCredentialEntry(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AuthenticationCredentialsEntity>().ToTable(CredentialsTableName);
-            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Id).HasMaxLength(128);
+            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Id).HasMaxLength(256);
             modelBuilder.Entity<AuthenticationCredentialsEntity>().HasKey(e => e.Id);
-            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Email).HasMaxLength(128).IsRequired();
-            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Hash).HasMaxLength(128).IsRequired();
-            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Salt).HasMaxLength(128).IsRequired();;
+            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Email).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Hash).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Salt).HasMaxLength(256).IsRequired();;
             modelBuilder.Entity<AuthenticationCredentialsEntity>().Property(e => e.Brand).HasMaxLength(128).IsRequired(false);;
             modelBuilder.Entity<AuthenticationCredentialsEntity>().HasIndex(e => e.Id).IsUnique();
         }
@@ -68,11 +68,11 @@ public class DatabaseContext : DbContext
             modelBuilder.Entity<AuthLogModelDbModel>().ToTable(LogsTableName);
             modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.Id).UseIdentityColumn();
             modelBuilder.Entity<AuthLogModelDbModel>().HasKey(e => e.Id);
-            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.TraderId).HasMaxLength(128).IsRequired();
+            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.TraderId).HasMaxLength(256).IsRequired();
             modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.Ip).HasMaxLength(128).IsRequired(false);
-            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.UserAgent).HasMaxLength(128).IsRequired(false);
-            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.DateTime).HasMaxLength(128).IsRequired();;
-            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.Location).HasMaxLength(128).IsRequired(false);;
+            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.UserAgent).HasMaxLength(256).IsRequired(false);
+            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.DateTime).HasMaxLength(256).IsRequired();;
+            modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.Location).HasMaxLength(256).IsRequired(false);;
             modelBuilder.Entity<AuthLogModelDbModel>().HasIndex(e => e.TraderId).IsUnique(false);
         }
         //

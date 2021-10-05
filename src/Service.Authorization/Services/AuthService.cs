@@ -37,7 +37,7 @@ namespace Service.Authorization.Services
             var cacheResult = _authenticationCredentialsCacheReader.GetByEmail(request.Email, request.Brand);
             string traderId = null;
 
-            if (cacheResult != null && cacheResult.Authenticate(request.Hash, request.Salt))
+            if (cacheResult != null && cacheResult.Authenticate(request.Password))
             {
                 traderId = cacheResult.Id;
             }
@@ -46,7 +46,7 @@ namespace Service.Authorization.Services
                 var responseFromDb = await _authenticationCredentialsRepository
                     .GetByEmailAsync(request.Email, request.Brand);
 
-                if (responseFromDb != null && responseFromDb.Authenticate(request.Hash, request.Salt))
+                if (responseFromDb != null && responseFromDb.Authenticate(request.Password))
                 {
                     await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
                     await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(responseFromDb);
