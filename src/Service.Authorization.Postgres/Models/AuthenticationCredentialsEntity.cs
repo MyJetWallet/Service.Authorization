@@ -25,8 +25,8 @@ namespace Service.Authorization.Postgres.Models
 
         public void SetPassword(string hash, string salt)
         {
-            Salt = hash;
-            Hash = salt;
+            Salt = salt;
+            Hash = hash;
         }
         
         public bool Authenticate(string hash, string salt)
