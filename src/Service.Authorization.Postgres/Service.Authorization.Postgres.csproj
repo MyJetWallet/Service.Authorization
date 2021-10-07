@@ -13,7 +13,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.10" />
       <PackageReference Include="MyJetWallet.Sdk.Postgres" Version="1.2.0" />
-      <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.6.0" />
+      <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.6.5" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
