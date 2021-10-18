@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.Authorization.Domain.Models.ServiceBus;
 using Service.Authorization.Grpc;
 using Service.Authorization.Grpc.Contracts;
 using Service.Authorization.NoSql;
-using Service.Authorization.Postgres;
 using Service.Authorization.Postgres.Models;
-using Service.Authorization.Utils;
 
 namespace Service.Authorization.Services
 {
@@ -20,8 +19,14 @@ namespace Service.Authorization.Services
         private readonly AuthenticationCredentialsCacheWriter _authenticationCredentialsCacheWriter;
         private readonly AuthenticationCredentialsRepository _authenticationCredentialsRepository;
         private readonly AuthLogQueue _authLogQueue;
-        private readonly IPublisher<ClientAuthenticationMessage> _publisher;
-        public AuthService(ILogger<AuthService> logger, AuthenticationCredentialsCacheReader authenticationCredentialsCacheReader, AuthenticationCredentialsCacheWriter authenticationCredentialsCacheWriter, AuthenticationCredentialsRepository authenticationCredentialsRepository, AuthLogQueue authLogQueue, IPublisher<ClientAuthenticationMessage> publisher)
+        private readonly IServiceBusPublisher<ClientAuthenticationMessage> _publisher;
+        public AuthService(
+            ILogger<AuthService> logger, 
+            AuthenticationCredentialsCacheReader authenticationCredentialsCacheReader, 
+            AuthenticationCredentialsCacheWriter authenticationCredentialsCacheWriter, 
+            AuthenticationCredentialsRepository authenticationCredentialsRepository, 
+            AuthLogQueue authLogQueue, 
+            IServiceBusPublisher<ClientAuthenticationMessage> publisher)
         {
             _logger = logger;
             _authenticationCredentialsCacheReader = authenticationCredentialsCacheReader;
