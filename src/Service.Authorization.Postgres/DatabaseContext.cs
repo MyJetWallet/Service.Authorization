@@ -3,12 +3,13 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Postgres;
 using MyJetWallet.Sdk.Service;
 using Service.Authorization.Postgres.Models;
 
 namespace Service.Authorization.Postgres
 {
-public class DatabaseContext : DbContext
+public class DatabaseContext : MyDbContext
     {
         public const string Schema = "authorization";
 
@@ -25,8 +26,6 @@ public class DatabaseContext : DbContext
         
         public DbSet<AuthLogModelDbModel> AuthLogModelDbModels { get; set; }
 
-        public static ILoggerFactory LoggerFactory { get; set; }
-
         public static DatabaseContext Create(DbContextOptionsBuilder<DatabaseContext> options)
         {
             var activity = MyTelemetry.StartActivity($"Database context {Schema}")?.AddTag("db-schema", Schema);
@@ -35,12 +34,7 @@ public class DatabaseContext : DbContext
 
             return ctx;
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (LoggerFactory != null) optionsBuilder.UseLoggerFactory(LoggerFactory).EnableSensitiveDataLogging();
-        }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(Schema);
@@ -75,22 +69,6 @@ public class DatabaseContext : DbContext
             modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.Location).HasMaxLength(256).IsRequired(false);;
             modelBuilder.Entity<AuthLogModelDbModel>().HasIndex(e => e.TraderId).IsUnique(false);
         }
-        //
-        // public async Task<int> InsertAsync(TransferEntity entity)
-        // {
-        //     var result = await Transfers.Upsert(entity).On(e => e.TransactionId).NoUpdate().RunAsync();
-        //     return result;
-        // }
-        //
-        // public async Task UpdateAsync(TransferEntity entity)
-        // {
-        //     await UpdateAsync(new List<TransferEntity>{entity});
-        // }
-        //
-        // public async Task UpdateAsync(IEnumerable<TransferEntity> entities)
-        // {
-        //     Transfers.UpdateRange(entities);
-        //     await SaveChangesAsync();
-        // }
+        
     }
 }
