@@ -25,7 +25,7 @@ namespace Service.Authorization.Client
                 TopicQueueType.Permanent);
         }
 
-        public static void RegisterAuthCredentialsCache(this ContainerBuilder builder, MyNoSqlTcpClient noSqlClient, string myNoSqlWriterUrl, byte[] encKey, byte[] initVector)
+        public static void RegisterAuthCredentialsCache(this ContainerBuilder builder, IMyNoSqlSubscriber noSqlClient, string myNoSqlWriterUrl, byte[] encKey, byte[] initVector)
         {
             builder
                 .RegisterInstance(MyNoSqlAuthCacheFactory.CreateAuthCacheNoSqlWriter(

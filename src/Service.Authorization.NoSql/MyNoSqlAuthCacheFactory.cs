@@ -9,7 +9,7 @@ namespace Service.Authorization.NoSql
         private const string AuthCache = "auth-cache";
 
         public static AuthenticationCredentialsCacheReader CreateAuthCacheMyNoSqlReader(
-            this MyNoSqlTcpClient client, byte[] key, byte[] initVector)
+            this IMyNoSqlSubscriber client, byte[] key, byte[] initVector)
         {
             return new AuthenticationCredentialsCacheReader(
                 new MyNoSqlReadRepository<AuthenticationCredentialsCacheNoSqlEntity>(client,
