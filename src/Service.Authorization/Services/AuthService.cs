@@ -20,6 +20,7 @@ namespace Service.Authorization.Services
         private readonly AuthenticationCredentialsRepository _authenticationCredentialsRepository;
         private readonly AuthLogQueue _authLogQueue;
         private readonly IServiceBusPublisher<ClientAuthenticationMessage> _publisher;
+        private readonly IServiceBusPublisher<PasswordChangedMessage> _passwordChangePublisher;
         public AuthService(
             ILogger<AuthService> logger, 
             AuthenticationCredentialsCacheReader authenticationCredentialsCacheReader, 
@@ -177,6 +178,15 @@ namespace Service.Authorization.Services
             await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
             await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(newEntity);
             _logger.LogInformation("ChangePasswordAsync.AddByDatabaseEntity {@Entity}", newEntity);
+            
+            var message = new PasswordChangedMessage
+            {
+                TraderId = newEntity.Id,
+                Brand = newEntity.Brand,
+                DatePublish = DateTime.UtcNow
+            };
+
+            await _passwordChangePublisher.PublishAsync(message);
 
             return new ChangePasswordGrpcResponse();
         }

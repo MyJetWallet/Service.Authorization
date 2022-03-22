@@ -24,6 +24,13 @@ namespace Service.Authorization.Client
             builder.RegisterMyServiceBusSubscriberBatch<ClientAuthenticationMessage>(serviceBusClient, ClientAuthenticationMessage.TopicName, queue,
                 TopicQueueType.Permanent);
         }
+        
+        public static void RegisterClientChangePasswordSubscriber(this ContainerBuilder builder, MyServiceBusTcpClient serviceBusClient, string queue)
+        {
+            builder.RegisterMyServiceBusSubscriberBatch<PasswordChangedMessage>(serviceBusClient, PasswordChangedMessage.TopicName, queue,
+                TopicQueueType.Permanent);
+        }
+
 
         public static void RegisterAuthCredentialsCache(this ContainerBuilder builder, IMyNoSqlSubscriber noSqlClient, string myNoSqlWriterUrl, byte[] encKey, byte[] initVector)
         {

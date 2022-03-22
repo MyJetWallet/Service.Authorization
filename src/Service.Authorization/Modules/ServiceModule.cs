@@ -39,6 +39,9 @@ namespace Service.Authorization.Modules
             builder.RegisterMyServiceBusPublisher<ClientAuthenticationMessage>(spotServiceBusClient,
                 ClientAuthenticationMessage.TopicName, false);
             
+            builder.RegisterMyServiceBusPublisher<PasswordChangedMessage>(spotServiceBusClient,
+                PasswordChangedMessage.TopicName, false);
+            
             builder.RegisterType<AuthenticationCredentialsRepository>().AsSelf().SingleInstance();
             builder.RegisterType<AuthLogRepository>().AsSelf().SingleInstance();
             builder.RegisterType<AuthLogQueue>().AsSelf().SingleInstance();
