@@ -102,5 +102,17 @@ namespace Service.Authorization.Services
             await ctx.CredentialsEntities.AddAsync(entity);
             await ctx.SaveChangesAsync();
         }
+        
+        public async Task RemoveCredentialsAsync(string clientId)
+        {
+            await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
+            var result = await ctx.CredentialsEntities.FirstOrDefaultAsync(t => t.Id == clientId.ToLower());
+
+            if (result != null)
+            {
+                ctx.CredentialsEntities.Remove(result);
+                await ctx.SaveChangesAsync();
+            }
+        }
     }
 }

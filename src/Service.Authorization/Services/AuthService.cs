@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.Authorization.Domain.Models.ServiceBus;
@@ -231,6 +232,16 @@ namespace Service.Authorization.Services
             _logger.LogInformation("RegisterCredentialsAsync {@Request}", entity);
             await _authenticationCredentialsRepository.AddCredentialsAsync(AuthenticationCredentialsEntity.Create(entity.Id, entity.EncodedEmail, entity.Hash, entity.Salt, entity.Brand));
             _logger.LogInformation("RegisterCredentialsAsync: Credential added {@Request}", entity);
+        }
+
+        public async ValueTask RemoveCredentialsAsync(RemoveCredentialsGrpcRequest request)
+        {
+            if (string.IsNullOrEmpty(request.ClientId))
+                return;
+            
+            await _authenticationCredentialsRepository.RemoveCredentialsAsync(request.ClientId);
+
+            _logger.LogInformation("Credentials for client {clientId} is removed", request.ClientId);
         }
 
         private async ValueTask SendAuthTriggerEvent(AuthenticateGrpcRequest request, string traderId)

@@ -34,6 +34,8 @@ namespace Service.Authorization.Grpc
 
         [OperationContract]
         ValueTask RegisterCredentialsAsync(AuthCredentialsGrpcModel entity);
-
+        
+        [OperationContract]
+        ValueTask RemoveCredentialsAsync(RemoveCredentialsGrpcRequest request);
     }
 }
