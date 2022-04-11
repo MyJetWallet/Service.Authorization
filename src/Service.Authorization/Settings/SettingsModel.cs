@@ -29,5 +29,8 @@ namespace Service.Authorization.Settings
         [YamlProperty("Authorization.SpotServiceBusHostPort")]
         public string SpotServiceBusHostPort { get; set; }
         
+        [YamlProperty("Authorization.ClientBlockerGrpcService")]
+        public string ClientBlockerGrpcService { get; set; }
+        
     }
 }

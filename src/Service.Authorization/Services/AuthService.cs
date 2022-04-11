@@ -9,6 +9,8 @@ using Service.Authorization.Grpc;
 using Service.Authorization.Grpc.Contracts;
 using Service.Authorization.NoSql;
 using Service.Authorization.Postgres.Models;
+using Service.ClientBlocker.Grpc;
+using Service.ClientBlocker.Grpc.Models;
 
 namespace Service.Authorization.Services
 {
@@ -21,13 +23,14 @@ namespace Service.Authorization.Services
         private readonly AuthLogQueue _authLogQueue;
         private readonly IServiceBusPublisher<ClientAuthenticationMessage> _publisher;
         private readonly IServiceBusPublisher<PasswordChangedMessage> _passwordChangePublisher;
+        private readonly IClientAttemptService _attemptService;
         public AuthService(
             ILogger<AuthService> logger, 
             AuthenticationCredentialsCacheReader authenticationCredentialsCacheReader, 
             AuthenticationCredentialsCacheWriter authenticationCredentialsCacheWriter, 
             AuthenticationCredentialsRepository authenticationCredentialsRepository, 
             AuthLogQueue authLogQueue, 
-            IServiceBusPublisher<ClientAuthenticationMessage> publisher)
+            IServiceBusPublisher<ClientAuthenticationMessage> publisher, IClientAttemptService attemptService)
         {
             _logger = logger;
             _authenticationCredentialsCacheReader = authenticationCredentialsCacheReader;
@@ -35,6 +38,7 @@ namespace Service.Authorization.Services
             _authenticationCredentialsRepository = authenticationCredentialsRepository;
             _authLogQueue = authLogQueue;
             _publisher = publisher;
+            _attemptService = attemptService;
         }
 
         public async ValueTask<AuthenticateGrpcResponse> AuthenticateAsync(AuthenticateGrpcRequest request)
@@ -59,6 +63,15 @@ namespace Service.Authorization.Services
                     _logger.LogInformation("AuthenticateAsync.AddByDatabaseEntity {@Entity}", responseFromDb);
 
                     traderId = responseFromDb.Id;
+                }
+
+                if (responseFromDb != null && !responseFromDb.Authenticate(request.Password))
+                {
+                    await _attemptService.TrackLoginAttempt(new TrackLoginAttemptRequest
+                    {
+                        ClientId = responseFromDb.Id,
+                        IsSuccess = false
+                    });
                 }
             }
 

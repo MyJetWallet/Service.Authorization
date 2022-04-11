@@ -12,6 +12,7 @@ using Service.Authorization.Domain.Models.ServiceBus;
 using Service.Authorization.NoSql;
 using Service.Authorization.Postgres;
 using Service.Authorization.Services;
+using Service.ClientBlocker.Client;
 
 namespace Service.Authorization.Modules
 {
@@ -29,6 +30,8 @@ namespace Service.Authorization.Modules
                     Program.EncodingInitVector))
                 .AsSelf()
                 .SingleInstance();
+            
+            builder.RegisterClientBlockerClient(Program.Settings.ClientBlockerGrpcService);
             
             builder
                 .RegisterInstance(noSqlClient.CreateAuthCacheMyNoSqlReader(Program.EncodingKey,
