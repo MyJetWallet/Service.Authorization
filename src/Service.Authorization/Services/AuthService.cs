@@ -257,6 +257,7 @@ namespace Service.Authorization.Services
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(brand))
             {
                 await _authenticationCredentialsCacheWriter.DeleteAsync(email, brand);
+                _logger.LogInformation($"Cache is clear for {email.Substring(0, 2)}..{email.Substring(email.Length-2, 2)}");
             }
 
             _logger.LogInformation("Credentials for client {clientId} is removed", request.ClientId);

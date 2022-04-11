@@ -112,6 +112,7 @@ namespace Service.Authorization.Services
             {
                 ctx.CredentialsEntities.Remove(result);
                 await ctx.SaveChangesAsync();
+                
                 var email =  AuthenticationCredentialsEntity.EncodeEmail(result.Email, _initKey, _initVector);
                 var brand = result.Brand;
                 return (email, brand);
