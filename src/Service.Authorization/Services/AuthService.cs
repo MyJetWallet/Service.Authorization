@@ -239,7 +239,12 @@ namespace Service.Authorization.Services
             if (string.IsNullOrEmpty(request.ClientId))
                 return;
             
-            await _authenticationCredentialsRepository.RemoveCredentialsAsync(request.ClientId);
+            var (email, brand) = await _authenticationCredentialsRepository.RemoveCredentialsAsync(request.ClientId);
+
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(brand))
+            {
+                await _authenticationCredentialsCacheWriter.DeleteAsync(email, brand);
+            }
 
             _logger.LogInformation("Credentials for client {clientId} is removed", request.ClientId);
         }
