@@ -31,7 +31,8 @@ namespace Service.Authorization.Services
             AuthenticationCredentialsCacheWriter authenticationCredentialsCacheWriter, 
             AuthenticationCredentialsRepository authenticationCredentialsRepository, 
             AuthLogQueue authLogQueue, 
-            IServiceBusPublisher<ClientAuthenticationMessage> publisher, IClientAttemptService attemptService)
+            IServiceBusPublisher<ClientAuthenticationMessage> publisher, IClientAttemptService attemptService,
+            IServiceBusPublisher<PasswordChangedMessage> passwordChangePublisher)
         {
             _logger = logger;
             _authenticationCredentialsCacheReader = authenticationCredentialsCacheReader;
@@ -40,6 +41,7 @@ namespace Service.Authorization.Services
             _authLogQueue = authLogQueue;
             _publisher = publisher;
             _attemptService = attemptService;
+            _passwordChangePublisher = passwordChangePublisher;
         }
 
         public async ValueTask<AuthenticateGrpcResponse> AuthenticateAsync(AuthenticateGrpcRequest request)
