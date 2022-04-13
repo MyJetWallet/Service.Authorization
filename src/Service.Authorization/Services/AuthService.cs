@@ -49,49 +49,57 @@ namespace Service.Authorization.Services
             _logger.LogInformation("AuthenticateAsync {@Request}", request);
             var cacheResult = _authenticationCredentialsCacheReader.GetByEmail(request.Email, request.Brand);
             string traderId = null;
+            var status = AuthenticateResult.Unauthorized;
 
             if (cacheResult != null && cacheResult.Authenticate(request.Password))
             {
                 traderId = cacheResult.Id;
+                status = AuthenticateResult.Ok;
             }
             else
             {
                 var responseFromDb = await _authenticationCredentialsRepository
                     .GetByEmailAsync(request.Email, request.Brand);
 
-                if (responseFromDb != null && responseFromDb.Authenticate(request.Password))
-                {
-                    await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
-                    await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(responseFromDb);
-                    _logger.LogInformation("AuthenticateAsync.AddByDatabaseEntity {@Entity}", responseFromDb);
-
-                    traderId = responseFromDb.Id;
-                }
-
-                if (responseFromDb != null && !responseFromDb.Authenticate(request.Password))
-                {
-                    await _attemptService.TrackLoginAttempt(new TrackLoginAttemptRequest
+                if (responseFromDb == null)
+                    return new AuthenticateGrpcResponse
                     {
-                        ClientId = responseFromDb.Id,
-                        IsSuccess = false
-                    });
-                }
+                        TraderId = null,
+                        Result = status
+                    };
+                
+                traderId = responseFromDb.Id;
+
+                if (!responseFromDb.Authenticate(request.Password))
+                    return new AuthenticateGrpcResponse
+                    {
+                        TraderId = traderId,
+                        Result = status
+                    };
+                
+                await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
+                await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(responseFromDb);
+                _logger.LogInformation("AuthenticateAsync.AddByDatabaseEntity {@Entity}", responseFromDb);
+                    
+                status = AuthenticateResult.Ok;
+                        
+                _authLogQueue.HandleEvent(new AuthLogModelDbModel
+                {
+                    TraderId = traderId,
+                    Ip = request.Ip,
+                    UserAgent = request.UserAgent,
+                    DateTime = DateTime.UtcNow,
+                    Location = request.Location
+                });
+
+                await SendAuthTriggerEvent(request, traderId);
             }
 
-            if (traderId == null) return new AuthenticateGrpcResponse { TraderId = traderId };
-            
-            _authLogQueue.HandleEvent(new AuthLogModelDbModel
+            return new AuthenticateGrpcResponse
             {
                 TraderId = traderId,
-                Ip = request.Ip,
-                UserAgent = request.UserAgent,
-                DateTime = DateTime.UtcNow,
-                Location = request.Location
-            });
-
-            await SendAuthTriggerEvent(request, traderId);
-
-            return new AuthenticateGrpcResponse { TraderId = traderId };
+                Result = status
+            };
         }
 
         public async ValueTask<ExistsGrpcResponse> ExistsAsync(ExistsGrpcRequest request)

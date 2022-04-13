@@ -3,6 +3,12 @@ using Destructurama.Attributed;
 
 namespace Service.Authorization.Grpc.Contracts
 {
+    public enum AuthenticateResult
+    {
+        Ok,
+        Unauthorized,
+    }
+    
     [DataContract]
     public class AuthenticateGrpcRequest
     {
@@ -42,5 +48,6 @@ namespace Service.Authorization.Grpc.Contracts
     public class AuthenticateGrpcResponse
     {
         [DataMember(Order = 1)] public string TraderId { get; set; }
+        [DataMember(Order = 2)] public AuthenticateResult Result { get; set; }
     }
 }
