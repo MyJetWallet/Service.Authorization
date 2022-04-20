@@ -68,6 +68,10 @@ namespace Service.Authorization.Services
                         Result = status
                     };
                 
+                await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
+                await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(responseFromDb);
+                _logger.LogInformation("AuthenticateAsync.AddByDatabaseEntity {@Entity}", responseFromDb);
+                
                 traderId = responseFromDb.Id;
 
                 if (!responseFromDb.Authenticate(request.Password))
@@ -77,10 +81,6 @@ namespace Service.Authorization.Services
                         Result = status
                     };
                 
-                await _authenticationCredentialsCacheWriter.PurgeCache(Program.Settings.MaxItemsInCache);
-                await _authenticationCredentialsCacheWriter.AddByDatabaseEntity(responseFromDb);
-                _logger.LogInformation("AuthenticateAsync.AddByDatabaseEntity {@Entity}", responseFromDb);
-                    
                 status = AuthenticateResult.Ok;
                         
                 _authLogQueue.HandleEvent(new AuthLogModelDbModel
