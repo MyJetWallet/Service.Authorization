@@ -45,6 +45,11 @@ namespace Service.Authorization.Postgres.Models
             return email.ToLower().Encode(key,initVector);
         }
         
+        public static string DecodeEmail(string email, byte[] key, byte[] initVector)
+        {
+            return email.Decode(key,initVector).ToLower();
+        }
+        
         public static AuthenticationCredentialsEntity Create(string email, string hash, string salt, byte[] key, byte[] initVector, string brand)
         {
             var result = new AuthenticationCredentialsEntity
