@@ -8,6 +8,7 @@ using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
 using MyJetWallet.Sdk.ServiceBus;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
+using Service.Authorization.Domain.Models;
 using Service.Authorization.Domain.Models.ServiceBus;
 using Service.Authorization.NoSql;
 using Service.Authorization.Postgres;
@@ -30,6 +31,8 @@ namespace Service.Authorization.Modules
                     Program.EncodingInitVector))
                 .AsSelf()
                 .SingleInstance();
+            
+            builder.RegisterMyNoSqlWriter<PinRecordNoSqlEntity>()
             
             builder.RegisterClientBlockerClient(Program.Settings.ClientBlockerGrpcService);
             

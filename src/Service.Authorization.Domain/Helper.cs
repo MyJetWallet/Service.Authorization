@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Service.Authorization.NoSql
+namespace Service.Authorization.Domain
 {
     public static class AuthHelper
     {

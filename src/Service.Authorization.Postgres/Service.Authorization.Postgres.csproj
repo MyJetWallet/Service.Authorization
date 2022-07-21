@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Service.Authorization.Domain.Models\Service.Authorization.Domain.Models.csproj" />
       <ProjectReference Include="..\Service.Authorization.Domain\Service.Authorization.Domain.csproj" />
     </ItemGroup>
 

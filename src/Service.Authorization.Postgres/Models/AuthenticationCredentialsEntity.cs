@@ -1,7 +1,7 @@
 using System;
 using Destructurama.Attributed;
 using Newtonsoft.Json;
-using Service.Authorization.NoSql;
+using Service.Authorization.Domain;
 
 namespace Service.Authorization.Postgres.Models
 {

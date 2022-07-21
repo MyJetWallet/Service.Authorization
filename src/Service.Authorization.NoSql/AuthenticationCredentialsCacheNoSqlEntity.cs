@@ -1,4 +1,5 @@
 using MyNoSqlServer.Abstractions;
+using Service.Authorization.Domain;
 using Service.Authorization.Postgres;
 using Service.Authorization.Postgres.Models;
 

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Postgres;
 using MyJetWallet.Sdk.Service;
+using Service.Authorization.Domain.Models;
 using Service.Authorization.Postgres.Models;
 
 namespace Service.Authorization.Postgres
@@ -15,6 +16,7 @@ public class DatabaseContext : MyDbContext
 
         private const string CredentialsTableName = "authcredentials";
         private const string LogsTableName = "authlogs";
+        private const string PinRecordTable = "pinrecord";
 
         private Activity _activity;
 
@@ -25,6 +27,8 @@ public class DatabaseContext : MyDbContext
         public DbSet<AuthenticationCredentialsEntity> CredentialsEntities { get; set; }
         
         public DbSet<AuthLogModelDbModel> AuthLogModelDbModels { get; set; }
+        
+        public DbSet<PinRecord> PinRecords { get; set; }
 
         public static DatabaseContext Create(DbContextOptionsBuilder<DatabaseContext> options)
         {
@@ -41,6 +45,7 @@ public class DatabaseContext : MyDbContext
 
             SetCredentialEntry(modelBuilder);
             SetLogsEntry(modelBuilder);
+            SetPinRecordEntity(modelBuilder);
             
             base.OnModelCreating(modelBuilder);
         }
@@ -68,6 +73,14 @@ public class DatabaseContext : MyDbContext
             modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.DateTime).HasMaxLength(256).IsRequired();;
             modelBuilder.Entity<AuthLogModelDbModel>().Property(e => e.Location).HasMaxLength(256).IsRequired(false);;
             modelBuilder.Entity<AuthLogModelDbModel>().HasIndex(e => e.TraderId).IsUnique(false);
+        }
+        
+        private void SetPinRecordEntity(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PinRecord>().ToTable(PinRecordTable);
+            modelBuilder.Entity<PinRecord>().HasKey(e => e.ClientId);
+            modelBuilder.Entity<PinRecord>().Property(e => e.Salt).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<PinRecord>().Property(e => e.Hash).HasMaxLength(256).IsRequired();
         }
         
     }
