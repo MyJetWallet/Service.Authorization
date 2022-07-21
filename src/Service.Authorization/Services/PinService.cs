@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using MyNoSqlServer.Abstractions;
 using ProtoBuf.WellKnownTypes;
+using Service.Authorization.Domain;
 using Service.Authorization.Domain.Models;
 using Service.Authorization.Grpc;
 using Service.Authorization.Grpc.Contracts.PinDto;
@@ -32,29 +34,43 @@ namespace Service.Authorization.Services
 
         public async Task SetupPinAsync(SetupPinGrpcRequest request)
         {
-            var pin = request.Pin;
-            if (pin == null)
+            _logger.LogInformation("Setup pin for client: {clientId}, data: {dataJson}", 
+                request.ClientId,
+                new {request.Ip, request.IpCountry, request.RootSessionId, request.SessionId, request.UserAgent}.ToJson());
+            
+            if (string.IsNullOrEmpty(request.Pin))
             {
-                {
-                    _logger.LogError("Receive call SetupPinAsync with empty Pin");
-                    throw new Exception("Receive call SetupPinAsync with empty Pin");
-                }
+                _logger.LogError("Receive call SetupPinAsync with empty Pin");
+                throw new Exception("Receive call SetupPinAsync with empty Pin");
             }
-            _logger.LogInformation("Setup pin for client: {clientId}, session: {rootSessionId}", 
-                pin.ClientId, request.RootSessionId);
+            
+            if (string.IsNullOrEmpty(request.ClientId))
+            {
+                _logger.LogError("Receive call SetupPinAsync with empty ClientId");
+                throw new Exception("Receive call SetupPinAsync with empty ClientId");
+            }
+
+            var pin = new PinRecord()
+            {
+                ClientId = request.ClientId,
+                Salt = Guid.NewGuid().ToString("N"),
+                HasPinIssue = false,
+                IsInited = true
+            };
+            pin.Hash = AuthHelper.GeneratePasswordHash(request.Pin, pin.Salt);
+                
+            
             {
                 await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
-                request.Pin.HasPinIssue = false;
                 var session = await ctx.PinRecordSessionIssues
                     .FirstOrDefaultAsync(e => e.ClientId == pin.ClientId && e.RootSessionId == request.RootSessionId);
-
+                
                 if (session != null && session.CurrentFailAttempts > 0)
                 {
                     session.CurrentFailAttempts = 0;
+                    session.TotalFailAttempts = 0;
                     await ctx.SaveChangesAsync();
                 }
-
-                pin.HasPinIssue = false;
                     
                 await ctx.PinRecords.Upsert(pin).On(e => e.ClientId).RunAsync();
             }
@@ -63,33 +79,43 @@ namespace Service.Authorization.Services
 
         public async Task RemovePinAsync(RemovePinGrpcRequest request)
         {
-            _logger.LogInformation("Remove pin for client: {clientId}, RootSessionId: {rootSessionId}", 
-                request.ClientId, request.RootSessionId);
+            _logger.LogInformation("Remove pin for client: {clientId}, data: {dataJson}", 
+                request.ClientId, 
+                new {request.Ip, request.IpCountry, request.RootSessionId, request.SessionId, request.UserAgent}.ToJson());
+            
+            var pin = new PinRecord()
+            {
+                ClientId = request.ClientId,
+                Salt = string.Empty,
+                HasPinIssue = false,
+                IsInited = false
+            };
+            
             {
                 await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
-                var record = await ctx.PinRecords.FirstOrDefaultAsync(e => e.ClientId == request.ClientId);
-                if (record != null)
-                {
-                    ctx.PinRecords.Remove(record);
+                
+                await ctx.PinRecords.Upsert(pin).On(e => e.ClientId).RunAsync();
 
-                    var session = await ctx.PinRecordSessionIssues
+                var session = await ctx.PinRecordSessionIssues
                         .FirstOrDefaultAsync(e =>
                             e.ClientId == request.ClientId && e.RootSessionId == request.RootSessionId);
 
-                    if (session != null && session.CurrentFailAttempts > 0)
-                    {
-                        session.CurrentFailAttempts = 0;
-                    }
-                    await ctx.SaveChangesAsync();
+                if (session != null)
+                {
+                    session.CurrentFailAttempts = 0;
+                    session.TotalFailAttempts = 0;
                 }
+                await ctx.SaveChangesAsync();
             }
-            await _writer.DeleteAsync(PinRecordNoSqlEntity.GeneratePartitionKey(request.ClientId),
-                PinRecordNoSqlEntity.GenerateRowKey());
+            
+            await _writer.InsertOrReplaceAsync(PinRecordNoSqlEntity.Create(pin));
         }
 
         public async Task<CheckPinGrpcResponse> CheckPinAsync(CheckPinGrpcRequest request)
         {
-            _logger.LogInformation("Setup pin for client: {clientId}", request.ClientId);
+            _logger.LogInformation("Check pin for client: {clientId}, {dataJson}", 
+                request.ClientId,
+                new {request.Ip, request.IpCountry, request.RootSessionId, request.SessionId, request.UserAgent}.ToJson());
         
             PinRecord record = null;
 
@@ -98,7 +124,22 @@ namespace Service.Authorization.Services
             {
                 record = await ctx.PinRecords.FirstOrDefaultAsync(e => e.ClientId == request.ClientId);
                 if (record == null)
-                    return new CheckPinGrpcResponse() {IsValid = false};
+                {
+                    record = new PinRecord()
+                    {
+                        ClientId = request.ClientId,
+                        Hash = string.Empty,
+                        Salt = Guid.NewGuid().ToString("N"),
+                        IsInited = false,
+                        HasPinIssue = false
+                    };
+                    ctx.PinRecords.Add(record);
+                }
+
+                if (!record.IsInited)
+                {
+                    return new CheckPinGrpcResponse() {IsValid = true};
+                }
 
                 var session = await ctx.PinRecordSessionIssues
                     .FirstOrDefaultAsync(
@@ -110,6 +151,7 @@ namespace Service.Authorization.Services
 
                     if (blockedTime.TotalSeconds >= 1)
                     {
+                        record.HasPinIssue = true;
                         var response = new CheckPinGrpcResponse()
                         {
                             IsValid = false,
@@ -117,6 +159,9 @@ namespace Service.Authorization.Services
                             Attempts = 0,
                             TerminateSession = false
                         };
+                        
+                        _logger.LogInformation("FAIL Check pin for client: {clientId}. Response: {responseJson}", 
+                            request.ClientId, response.ToJson());
                         return response;
                     }
                 }
@@ -144,6 +189,7 @@ namespace Service.Authorization.Services
 
                     if (session.TotalFailAttempts >= Program.Settings.CountFailAttemptsToTerminate)
                     {
+                        record.HasPinIssue = true;
                         var response = new CheckPinGrpcResponse()
                         {
                             IsValid = false,
@@ -152,10 +198,13 @@ namespace Service.Authorization.Services
                             TerminateSession = true,
                             BlockPin = false
                         };
+                        _logger.LogInformation("FAIL Check pin for client: {clientId}. Response: {responseJson}", 
+                            request.ClientId, response.ToJson());
                         return response;
                     }
                     else if (session.CurrentFailAttempts >= Program.Settings.CountFailAttemptsToBlock)
                     {
+                        record.HasPinIssue = true;
                         session.BlockedTo = DateTime.UtcNow.AddSeconds(Program.Settings.BlockTimeInSec);
                         session.CurrentFailAttempts = 0;
                         var response = new CheckPinGrpcResponse()
@@ -166,6 +215,8 @@ namespace Service.Authorization.Services
                             TerminateSession = false,
                             BlockPin = true
                         };
+                        _logger.LogInformation("FAIL Check pin for client: {clientId}. Response: {responseJson}", 
+                            request.ClientId, response.ToJson());
                         return response;
                     }
                     else
@@ -173,7 +224,9 @@ namespace Service.Authorization.Services
                         var attempts = Program.Settings.CountFailAttemptsToBlock - session.CurrentFailAttempts;
                         if (attempts < 1)
                             attempts = 1;
-
+                        
+                        record.HasPinIssue = true;
+                        
                         var response = new CheckPinGrpcResponse()
                         {
                             IsValid = false,
@@ -182,6 +235,8 @@ namespace Service.Authorization.Services
                             TerminateSession = false,
                             BlockPin = false
                         };
+                        _logger.LogInformation("FAIL Check pin for client: {clientId}. Response: {responseJson}", 
+                            request.ClientId, response.ToJson());
                         return response;
                     }
                 }
@@ -205,8 +260,39 @@ namespace Service.Authorization.Services
             }
             finally
             {
+                await _writer.InsertOrReplaceAsync(PinRecordNoSqlEntity.Create(record));
                 await ctx.SaveChangesAsync();
             }
+            
+        }
+
+        public async Task<IsPinInitedResponse> IsPinInitedAsync(IsPinInitedRequest request)
+        {
+            PinRecord? record = null;
+
+            {
+                await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
+                record = await ctx.PinRecords.FirstOrDefaultAsync(e => e.ClientId == request.ClientId);
+                if (record == null)
+                {
+                    record = new PinRecord()
+                    {
+                        ClientId = request.ClientId,
+                        Hash = string.Empty,
+                        Salt = Guid.NewGuid().ToString("N"),
+                        HasPinIssue = false,
+                        IsInited = false
+                    };
+                    ctx.PinRecords.Add(record);
+                    await ctx.SaveChangesAsync();
+                }
+            }
+            await _writer.InsertOrReplaceAsync(PinRecordNoSqlEntity.Create(record));
+
+            return new IsPinInitedResponse()
+            {
+                IsInited = record.IsInited
+            };
         }
     }
 }

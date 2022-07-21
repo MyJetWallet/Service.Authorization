@@ -16,4 +16,7 @@ public interface IPinService
     
     [OperationContract]
     Task<CheckPinGrpcResponse> CheckPinAsync(CheckPinGrpcRequest request);
+    
+    [OperationContract]
+    Task<IsPinInitedResponse> IsPinInitedAsync(IsPinInitedRequest request);
 }

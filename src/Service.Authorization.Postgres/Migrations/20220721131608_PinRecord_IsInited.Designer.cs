@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Service.Authorization.Postgres;
@@ -11,9 +12,10 @@ using Service.Authorization.Postgres;
 namespace Service.Authorization.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220721131608_PinRecord_IsInited")]
+    partial class PinRecord_IsInited
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,6 +35,7 @@ namespace Service.Authorization.Postgres.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Hash")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -40,6 +43,7 @@ namespace Service.Authorization.Postgres.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Salt")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 

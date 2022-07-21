@@ -85,8 +85,8 @@ public class DatabaseContext : MyDbContext
             modelBuilder.Entity<PinRecord>().ToTable(PinRecordTable);
             modelBuilder.Entity<PinRecord>().HasKey(e => e.ClientId);
             modelBuilder.Entity<PinRecord>().Property(e => e.ClientId).HasMaxLength(256).IsRequired();
-            modelBuilder.Entity<PinRecord>().Property(e => e.Salt).HasMaxLength(256).IsRequired();
-            modelBuilder.Entity<PinRecord>().Property(e => e.Hash).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<PinRecord>().Property(e => e.Salt).HasMaxLength(256);
+            modelBuilder.Entity<PinRecord>().Property(e => e.Hash).HasMaxLength(256);
         }
         
         private void PinRecordSessionIssueEntity(ModelBuilder modelBuilder)

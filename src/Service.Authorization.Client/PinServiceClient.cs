@@ -34,7 +34,7 @@ public class PinServiceClient: IPinService
             PinRecordNoSqlEntity.GeneratePartitionKey(request.ClientId),
             PinRecordNoSqlEntity.GenerateRowKey());
 
-        if (record != null && !record.Pin.HasPinIssue && record.Pin.CheckPin(request.Pin))
+        if (record != null && !record.Pin.HasPinIssue && record.Pin.IsInited && record.Pin.CheckPin(request.Pin))
         {
             return new CheckPinGrpcResponse
             {
@@ -43,5 +43,22 @@ public class PinServiceClient: IPinService
         }
         
         return await _service.CheckPinAsync(request);
+    }
+
+    public async Task<IsPinInitedResponse> IsPinInitedAsync(IsPinInitedRequest request)
+    {
+        var record = _reader.Get(
+            PinRecordNoSqlEntity.GeneratePartitionKey(request.ClientId),
+            PinRecordNoSqlEntity.GenerateRowKey());
+        
+        if (record != null)
+        {
+            return new IsPinInitedResponse
+            {
+                IsInited = record.Pin.IsInited
+            };
+        }
+        
+        return await _service.IsPinInitedAsync(request);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Service.Authorization.Domain;
 
 namespace Service.Authorization.Tests
 {
@@ -11,9 +12,12 @@ namespace Service.Authorization.Tests
         }
 
         [Test]
-        public void Test1()
+        public void Test_hash()
         {
-            Console.WriteLine("Debug output");
+            var pass = "1111";
+            var salt = "qqqqqqqqq";
+            var hash = AuthHelper.GeneratePasswordHash(pass, salt);
+            Console.WriteLine($"hash: {hash}");
             Assert.Pass();
         }
     }

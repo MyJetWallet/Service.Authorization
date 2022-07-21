@@ -13,6 +13,8 @@ namespace Service.Authorization.Domain.Models
         [DataMember(Order = 3)] public string Salt { get; set; }
 
         [DataMember(Order = 4)] public bool HasPinIssue { get; set; }
+        
+        [DataMember(Order = 5)] public bool IsInited { get; set; }
 
         public bool CheckPin(string pin)
         {
