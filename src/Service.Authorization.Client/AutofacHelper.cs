@@ -57,9 +57,20 @@ namespace Service.Authorization.Client
             
             builder.RegisterMyNoSqlReader<PinRecordNoSqlEntity>(noSqlClient, PinRecordNoSqlEntity.TableName);
             builder.RegisterType<PinServiceClient>()
+                .As<IPinService>()
                 .WithParameter("service", factory.GetPinService())
                 .SingleInstance()
                 .AutoActivate();
+        }
+        
+        public static void RegisterPinRecordClientServiceWithOutCache(this ContainerBuilder builder,
+            string authorizationServiceGrpcUrl)
+        {
+            var factory = new AuthorizationClientFactory(authorizationServiceGrpcUrl);
+            
+            builder.RegisterInstance(factory.GetPinService())
+                .As<IPinService>()
+                .SingleInstance();
         }
     }
 }

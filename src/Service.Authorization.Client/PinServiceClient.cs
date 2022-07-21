@@ -18,9 +18,14 @@ public class PinServiceClient: IPinService
         _reader = reader;
     }
 
-    public Task SetupPinAsync(PinRecord request)
+    public Task SetupPinAsync(SetupPinGrpcRequest request)
     {
         return _service.SetupPinAsync(request);
+    }
+
+    public Task RemovePinAsync(RemovePinGrpcRequest request)
+    {
+        return _service.RemovePinAsync(request);
     }
 
     public async Task<CheckPinGrpcResponse> CheckPinAsync(CheckPinGrpcRequest request)
@@ -29,13 +34,14 @@ public class PinServiceClient: IPinService
             PinRecordNoSqlEntity.GeneratePartitionKey(request.ClientId),
             PinRecordNoSqlEntity.GenerateRowKey());
 
-        if (record == null)
-            return await _service.CheckPinAsync(request);
-        
-        var resp = new CheckPinGrpcResponse
+        if (record != null && !record.Pin.HasPinIssue && record.Pin.CheckPin(request.Pin))
         {
-            IsValid = record.Pin.CheckPin(request.Pin)
-        };
-        return resp;
+            return new CheckPinGrpcResponse
+            {
+                IsValid = record.Pin.CheckPin(request.Pin)
+            };
+        }
+        
+        return await _service.CheckPinAsync(request);
     }
 }

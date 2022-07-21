@@ -9,7 +9,11 @@ namespace Service.Authorization.Grpc;
 public interface IPinService
 {
     [OperationContract]
-    Task SetupPinAsync(PinRecord request);
+    Task SetupPinAsync(SetupPinGrpcRequest request);
+
+    [OperationContract]
+    Task RemovePinAsync(RemovePinGrpcRequest request);
+    
     [OperationContract]
     Task<CheckPinGrpcResponse> CheckPinAsync(CheckPinGrpcRequest request);
 }

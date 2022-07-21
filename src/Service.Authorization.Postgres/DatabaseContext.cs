@@ -17,6 +17,8 @@ public class DatabaseContext : MyDbContext
         private const string CredentialsTableName = "authcredentials";
         private const string LogsTableName = "authlogs";
         private const string PinRecordTable = "pinrecord";
+        private const string PinRecordSessionIssueTable = "pinrecord_session_issue";
+        
 
         private Activity _activity;
 
@@ -29,6 +31,8 @@ public class DatabaseContext : MyDbContext
         public DbSet<AuthLogModelDbModel> AuthLogModelDbModels { get; set; }
         
         public DbSet<PinRecord> PinRecords { get; set; }
+        
+        public DbSet<PinRecordSessionIssue> PinRecordSessionIssues { get; set; }
 
         public static DatabaseContext Create(DbContextOptionsBuilder<DatabaseContext> options)
         {
@@ -46,6 +50,7 @@ public class DatabaseContext : MyDbContext
             SetCredentialEntry(modelBuilder);
             SetLogsEntry(modelBuilder);
             SetPinRecordEntity(modelBuilder);
+            PinRecordSessionIssueEntity(modelBuilder);
             
             base.OnModelCreating(modelBuilder);
         }
@@ -79,8 +84,18 @@ public class DatabaseContext : MyDbContext
         {
             modelBuilder.Entity<PinRecord>().ToTable(PinRecordTable);
             modelBuilder.Entity<PinRecord>().HasKey(e => e.ClientId);
+            modelBuilder.Entity<PinRecord>().Property(e => e.ClientId).HasMaxLength(256).IsRequired();
             modelBuilder.Entity<PinRecord>().Property(e => e.Salt).HasMaxLength(256).IsRequired();
             modelBuilder.Entity<PinRecord>().Property(e => e.Hash).HasMaxLength(256).IsRequired();
+        }
+        
+        private void PinRecordSessionIssueEntity(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PinRecordSessionIssue>().ToTable(PinRecordSessionIssueTable);
+            modelBuilder.Entity<PinRecordSessionIssue>().HasKey(e => new {e.ClientId, e.RootSessionId});
+            modelBuilder.Entity<PinRecordSessionIssue>().Property(e => e.ClientId).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<PinRecordSessionIssue>().Property(e => e.RootSessionId).HasMaxLength(256).IsRequired();
+            modelBuilder.Entity<PinRecordSessionIssue>().HasIndex(e => new {e.ClientId, e.IsActive});
         }
         
     }

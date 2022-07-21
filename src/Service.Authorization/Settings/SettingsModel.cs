@@ -32,5 +32,14 @@ namespace Service.Authorization.Settings
         [YamlProperty("Authorization.ClientBlockerGrpcService")]
         public string ClientBlockerGrpcService { get; set; }
         
+        [YamlProperty("Authorization.BlockSettings.CountFailAttemptsToBlock")]
+        public int CountFailAttemptsToBlock { get; set; }
+        
+        [YamlProperty("Authorization.BlockSettings.BlockTimeInSecond")]
+        public int BlockTimeInSec { get; set; }
+        
+        [YamlProperty("Authorization.BlockSettings.CountFailAttemptsToTerminate")]
+        public int CountFailAttemptsToTerminate { get; set; }
+        
     }
 }
