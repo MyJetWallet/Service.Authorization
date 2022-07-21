@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.ServiceBus;
 using MyNoSqlServer.DataReader;
 using MyServiceBus.Abstractions;
@@ -46,6 +47,19 @@ namespace Service.Authorization.Client
                 .RegisterInstance(noSqlClient.CreateAuthCacheMyNoSqlReader(encKey, initVector))
                 .AsSelf()
                 .SingleInstance();
+        }
+
+        public static void RegisterPinRecordClientService(this ContainerBuilder builder,
+            string authorizationServiceGrpcUrl,
+            IMyNoSqlSubscriber noSqlClient)
+        {
+            var factory = new AuthorizationClientFactory(authorizationServiceGrpcUrl);
+            
+            builder.RegisterMyNoSqlReader<PinRecordNoSqlEntity>(noSqlClient, PinRecordNoSqlEntity.TableName);
+            builder.RegisterType<PinServiceClient>()
+                .WithParameter("service", factory.GetPinService())
+                .SingleInstance()
+                .AutoActivate();
         }
     }
 }

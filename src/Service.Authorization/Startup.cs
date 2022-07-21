@@ -58,6 +58,7 @@ namespace Service.Authorization
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcSchema<AuthService, IAuthService>();
+                endpoints.MapGrpcSchema<PinService, IPinService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 

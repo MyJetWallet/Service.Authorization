@@ -52,7 +52,7 @@ namespace Service.Authorization.Services
 
             var resp = new CheckPinGrpcResponse
             {
-                IsValid = record.Hash == request.Hash
+                IsValid = record.CheckPin(request.Pin)
             };
             return resp;
         }

@@ -9,5 +9,5 @@ public class CheckPinGrpcRequest
     public string ClientId { get; set; }
     
     [DataMember(Order = 2)]
-    public string Hash { get; set; }
+    public string Pin { get; set; }
 }

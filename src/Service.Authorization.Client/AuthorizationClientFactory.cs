@@ -12,5 +12,9 @@ namespace Service.Authorization.Client
         }
 
         public IAuthService GetAuthService() => CreateGrpcService<IAuthService>();
+        
+        public IPinService GetPinService() => CreateGrpcService<IPinService>();
+        
+        
     }
 }

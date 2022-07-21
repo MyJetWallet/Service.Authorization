@@ -31,8 +31,9 @@ namespace Service.Authorization.Modules
                     Program.EncodingInitVector))
                 .AsSelf()
                 .SingleInstance();
-            
-            builder.RegisterMyNoSqlWriter<PinRecordNoSqlEntity>()
+
+            builder.RegisterMyNoSqlWriter<PinRecordNoSqlEntity>(() => Program.Settings.MyNoSqlWriterUrl,
+                PinRecordNoSqlEntity.TableName);
             
             builder.RegisterClientBlockerClient(Program.Settings.ClientBlockerGrpcService);
             
